@@ -13,7 +13,7 @@ class MatrixRowIterator
     using pointer = value_type*;
     using reference = value_type&;
 
-    MatrixRowIterator(pointer ptr)::m_ptr(ptr){}
+    MatrixRowIterator(pointer ptr):m_ptr(ptr){}
 
     MatrixRowIterator& operator++()
     {
