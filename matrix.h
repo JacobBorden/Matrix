@@ -1,4 +1,4 @@
-#pragma  once
+#pragma once
 #ifndef MATRIX_H
 #define MATRIX_H
 
@@ -8,63 +8,373 @@
 template <typename MatrixRow>
 class MatrixRowIterator
 {
-    public:
+public:
     using value_type = typename MatrixRow::value_type;
-    using pointer = value_type*;
-    using reference = value_type&;
+    using pointer = value_type *;
+    using reference = value_type &;
 
-    MatrixRowIterator(pointer ptr):m_ptr(ptr){}
+    MatrixRowIterator(pointer ptr) : m_ptr(ptr) {}
 
-    MatrixRowIterator& operator++()
+    MatrixRowIterator &operator++()
     {
         m_ptr++;
         return *this;
     }
 
-MatrixRowIterator operator++(int)
+    MatrixRowIterator operator++(int)
+    {
+        MatrixRowIterator it = *this;
+        ++(this);
+        return it;
+    }
+
+    MatrixRowIterator &operator--()
+    {
+        m_ptr--;
+        return *this;
+    }
+
+    MatrixRowIterator operator--(int)
+    {
+        MatrixRowIterator it = *this;
+        --(this);
+        return it;
+    }
+
+    pointer operator->()
+    {
+        return m_ptr;
+    }
+
+    reference operator*()
+    {
+        return *m_ptr;
+    }
+
+    bool operator==(MatrixRowIterator other)
+    {
+        return this->m_ptr == other.m_ptr;
+    }
+
+    bool operator!=(MatrixRowIterator other)
+    {
+        return this->m_ptr != other.m_ptr;
+    }
+
+private:
+    pointer m_ptr;
+};
+
+template <typename Matrix>
+class MatrixIterator
 {
-    MatrixRowIterator it = *this;
-    ++(this);
-    return it;
+public:
+    using value_type = typename MatrixRow<Matrix::value_type>;
+    using pointer = value_type *;
+    using reference = value_type &;
+
+    MatrixIterator(pointer ptr) : m_ptr(ptr) {}
+
+    MatrixIterator &operator++()
+    {
+        m_ptr++ return *this;
+    }
+
+    MatrixIterator operator++(int)
+    {
+        MatrixIterator it = *this;
+        ++(this);
+        return it;
+    }
+
+    MatrixIterator &operator--()
+    {
+        m_ptr-- return *this;
+    }
+
+    MatrixIterator operator--(int)
+    {
+        MatrixIterator it = *this;
+        --(this);
+        return it;
+    }
+
+    pointer operator->()
+    {
+        return m_ptr;
+    }
+
+    reference operator*()
+    {
+        return *m_ptr;
+    }
+
+    bool operator==(MatrixIterator other)
+    {
+        return this->m_ptr == other.m_ptr;
+    }
+
+    bool operator!=(MatrixIterator other)
+    {
+        return this->m_ptr != other.m_ptr;
+    }
+
+private:
+    pointer m_ptr;
+};
+
+template <typename T>
+class MatrixRow
+{
+public:
+    using value_type = T;
+    using Iterator = MatrixRowIterator<MatrixRow<T>>;
+
+public:
+    MatrixRow();
+    MatrixRow(size_t);
+    ~MatrixRow();
+    void resize(size_t size);
+    void assign(size_t size, const value_type &val);
+    size_t size();
+    size_t capacity();
+    T &operator[](int i);
+    Iterator begin() { return Iterator(m_Data); }
+    Iterator end() { return Iterator(m_Data + m_Size); }
+
+private:
+    size_t m_Size;
+    size_t m_Capacity;
+    T *m_Data;
+};
+
+template <typename T>
+inline MatrixRow<T>::MatrixRow()
+{
+    m_Data = new T[0];
+    m_Size = 0;
+    m_Capacity = sizeof(T) * m_Size;
 }
 
-MatrixRowIterator& operator--()
+template <typename T>
+inline MatrixRow<T>::MatrixRow(size_t size)
 {
-    m_ptr--;
+    m_Data = new T[size];
+    m_Size = size;
+    m_Capacity = sizeof(T) * m_Size;
+    std::fill(begin(), end(), NULL);
+}
+
+template <typename T>
+inline MatrixRow<T>::~MatrixRow()
+{
+    delete[] m_Data;
+}
+
+template <typename T>
+inline void MatrixRow<T>::resize(size_t newSize)
+{
+    T *newBlock = new T[newSize];
+    for (size_t i = 0; i < newSize; i++)
+        newBlock[i] = NULL;
+
+    if (newSize > m_Size)
+        for (size_t i = 0; i < m_Size; i++)
+            newBlock[i] = std::move(m_Data[i]);
+
+    else
+        for (size_t i = 0; i < newSize; i++)
+            newBlock[i] = std::move(m_Data[i]);
+
+    delete[] m_Data;
+    m_Data = newBlock;
+    m_Size = newSize;
+    m_Capacity = sizeof(T) * m_Size;
+}
+
+template <typename T>
+inline void MatrixRow<T>::assign(size_t size, const value_type &val)
+{
+    resize(size);
+    std::fill(begin(), end(), val);
+}
+
+template <typename T>
+inline size_t MatrixRow<T>::size()
+{
+    return m_Size;
+}
+
+template <typename T>
+inline size_t MatrixRow<T>::capacity()
+{
+    return m_Capacity;
+}
+
+template <typename T>
+inline T &MatrixRow<T>::operator[](int i)
+{
+    return m_Data[i];
+}
+
+template <typename T>
+class Matrix
+{
+public:
+    using value_type = T;
+    using Iterator = MatrixIterator<Matrix<T>>;
+
+public:
+    Matrix<T>();
+    Matrix<T>(int row_count, int column_count);
+    ~Matrix<T>();
+    int size();
+    int rows();
+    int cols();
+    size_t capacity();
+    void resize(int row_count, int col_count);
+    Matrix<T> SigmoidMatrix();
+    Matrix<T> Randomize();
+    MatrixRow<T> &operator[](int i);
+    Matrix<T> operator*(Matrix<T> &b);
+    Matrix<T> operator+(Matrix<T> b);
+    Iterator begin() { return Iterator(m_Data); }
+    Iterator end() { return Iterator(m_Data + m_Rows); }
+
+private:
+    int m_Rows;
+    int m_Cols;
+    size_t m_Size;
+    size_t m_Capacity;
+    MatrixRow<T> *m_Data;
+};
+
+template <typename T>
+inline Matrix<T>::Matrix()
+{
+    m_Rows = 0;
+    m_Cols = 0;
+    m_Size = m_Rows * m_Cols;
+    m_Capacity = m_Size * sizeof(T);
+    m_Data = new MatrixRow<T>[m_Rows];
+    for (int i : this)
+        m_Data[i] = MatrixRow<T>(m_Cols);
+}
+
+template <typename T>
+inline Matrix<T>::Matrix(int row_count, int col_count)
+{
+    m_Rows = row_count;
+    m_Cols = col_count;
+    m_Size = m_Rows * m_Cols;
+    m_Capacity = m_Size * sizeof(T);
+    m_Data = new MatrixRow<T>[m_Rows];
+    for (int i : this)
+        m_Data[i] = MatrixRow<T>(m_Cols);
+}
+
+template <typename T>
+inline Matrix<T>::~Matrix()
+{
+    delete[] m_Data;
+}
+
+template <typename T>
+inline int Matrix<T>::size()
+{
+    return m_Size;
+}
+
+template <typename T>
+inline int Matrix<T>::rows()
+{
+    return m_Rows;
+}
+
+template <typename T>
+inline int Matrix<T>::cols()
+{
+    return m_Cols;
+}
+
+template <typename T>
+inline size_t Matrix<T>::capacity()
+{
+    return m_Capacity;
+}
+
+template <typename T>
+inline void Matrix<T>::resize(int row_count, int col_count)
+{
+    m_Rows = row_count;
+    m_Cols = col_count;
+    m_Size = m_Rows * m_Cols;
+    m_Capacity = m_Size * sizeof(T);
+    m_Data->resize(m_Rows);
+
+    for (int i : this)
+        m_Data[i].resize(m_Cols);
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::SigmoidMatrix()
+{
+    for (int i : this)
+        for (int j : m_Data[i])
+            m_Data[i][j] = 1 / (1 + exp(m_Data[i][j]));
+
     return *this;
 }
 
-MatrixRowIterator operator--(int)
+template <typename T>
+inline Matrix<T> Matrix<T>::Randomize()
 {
-    MatrixRowIterator it = *this;
-    --(this);
-    return it;
+    srand(time(0));
+    for (int i : this)
+        for (int j : m_Data[i])
+        {
+            int num = rand() % 200 + 1 - 100;
+            m_Data[i][j] = num / 100.0;
+        }
+
+    return *this;
 }
 
-pointer operator->()
+template <typename T>
+inline MatrixRow<T> &Matrix<T>::operator[](int i)
 {
-    return m_ptr;
+    return m_Data[i];
 }
 
-reference operator*()
+template <typename T>
+inline Matrix<T> Matrix<T>::operator+(Matrix<T> b)
 {
-    return *m_ptr;
+    if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
+    {
+        Matrix<T> c(m_Rows, m_Cols);
+        for (int i : this)
+            for (int j : m_Data[i])
+                c[i][j] = m_Data[i][j] + b[i][j];
+        return c;
+    }
+
+    else
+        return NULL;
 }
 
-bool operator==(MatrixRowIterator other)
+template <typename T>
+inline Matrix<T> Matrix<T>::operator*(Matrix<T> &b)
 {
-    return this->m_ptr == other.m_ptr;
+    if (m_Cols == b.m_Rows)
+    {
+        for (int i : this)
+            for (int j : m_Data[i])
+                for (int k : b[j])
+                    c[i][k] += m_Data[i][j] * b[j][k];
+        return c;
+    }
+
+    else
+        return NULL;
 }
-
-bool operator!=(MatrixRowIterator other)
-{
-    return this->m_ptr != other.m_ptr;
-}
-
-private:
-pointer m_ptr;
-
-};
-
-
-#endif 
+#endif
