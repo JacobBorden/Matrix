@@ -177,16 +177,11 @@ inline void MatrixRow<T>::resize(size_t newSize)
     T *newBlock = new T[newSize];
     for (size_t i = 0; i < newSize; i++)
         newBlock[i] = NULL;
-
     if (newSize > m_Size)
-        for (size_t i = 0; i < m_Size; i++)
+        for (int i = 0; i < m_Size; i++)
             newBlock[i] = std::move(m_Data[i]);
-
     else
-        for (size_t i = 0; i < newSize; i++)
-            newBlock[i] = std::move(m_Data[i]);
-
-    delete[] m_Data;
+        newBlock = std::move(m_Data);
     m_Data = newBlock;
     m_Size = newSize;
     m_Capacity = sizeof(T) * m_Size;
@@ -233,14 +228,20 @@ public:
     int cols();
     size_t capacity();
     void resize(int row_count, int col_count);
+    void assign(int row_count, int col_count, T val);
     Matrix<T> SigmoidMatrix();
     Matrix<T> Randomize();
+    Matrix<T> CreateDeterminate();
     MatrixRow<T> &operator[](int i);
     Matrix<T> operator*(Matrix<T> &b);
     Matrix<T> operator+(Matrix<T> b);
     Matrix<T> operator+(T b);
-    Matrix<T>operator+=(Matrix<T>b);
+    Matrix<T> operator+=(Matrix<T> b);
     Matrix<T> operator+=(T b);
+    Matrix<T> operator-(Matrix<T> b);
+    Matrix<T> operator-(T b);
+    Matrix<T> operator-=(Matrix<T> b);
+    Matrix<T> operator-=(T b);
     Iterator begin() { return Iterator(m_Data); }
     Iterator end() { return Iterator(m_Data + m_Rows); }
 
@@ -308,21 +309,39 @@ inline size_t Matrix<T>::capacity()
 template <typename T>
 inline void Matrix<T>::resize(int row_count, int col_count)
 {
-    m_Rows = row_count;
+    
     m_Cols = col_count;
     m_Size = m_Rows * m_Cols;
     m_Capacity = m_Size * sizeof(T);
-    m_Data->resize(m_Rows);
+    MatrixRow<T> *newBlock = new MatrixRow<T>[row_count];
+    for (size_t i = 0; i < row_count; i++)
+        newBlock[i] = NULL;
+            if (row_count > m_Rows)
+        for (int i = 0; i < m_Rows; i++)
+            newBlock[i] = std::move(m_Data[i]);
+    else
+        newBlock = std::move(m_Data);
+    m_Data = newBlock;
+    m_Rows = row_count;
 
-    for (auto i : *this)
+    for (auto &i : *this)
         i.resize(m_Cols);
+}
+
+template <typename T>
+inline void Matrix<T>::assign(int row_count, int col_count, T val)
+{
+    this->resize(row_count, col_count);
+    for (auto i : *this)
+        for (auto &j : i)
+            j = val;
 }
 
 template <typename T>
 inline Matrix<T> Matrix<T>::SigmoidMatrix()
 {
     for (auto i : *this)
-        for (auto j : i)
+        for (auto &j : i)
             j = 1 / (1 + exp(j));
 
     return *this;
@@ -333,11 +352,21 @@ inline Matrix<T> Matrix<T>::Randomize()
 {
     srand(time(0));
     for (auto i : *this)
-        for (auto j : i)
+        for (auto &j : i)
         {
             int num = rand() % 200 + 1 - 100;
             j = num / 100.0;
         }
+
+    return *this;
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::CreateDeterminate()
+{
+    this->assign(m_Rows, m_Cols, 0);
+    for (int i = 0; i < m_Rows; i++)
+        m_Data[i][i] = 1;
 
     return *this;
 }
@@ -364,17 +393,15 @@ inline Matrix<T> Matrix<T>::operator+(Matrix<T> b)
         return *this;
 }
 
-
 template <typename T>
 inline Matrix<T> Matrix<T>::operator+(T b)
 {
-   
-        Matrix<T> c(m_Rows, m_Cols);
-        for (int i = 0; i < m_Rows; i++)
-            for (int j = 0; j < m_Cols; j++)
-                c[i][j] = m_Data[i][j] + b;
-        return c;
- 
+
+    Matrix<T> c(m_Rows, m_Cols);
+    for (int i = 0; i < m_Rows; i++)
+        for (int j = 0; j < m_Cols; j++)
+            c[i][j] = m_Data[i][j] + b;
+    return c;
 }
 
 template <typename T>
@@ -389,20 +416,19 @@ inline Matrix<T> Matrix<T>::operator+=(Matrix<T> b)
         *this = c;
     }
 
-        return *this;
+    return *this;
 }
 
 template <typename T>
 inline Matrix<T> Matrix<T>::operator+=(T b)
 {
-   
-        Matrix<T> c(m_Rows, m_Cols);
-        for (int i = 0; i < m_Rows; i++)
-            for (int j = 0; j < m_Cols; j++)
-                c[i][j] = m_Data[i][j] + b;
-        *this = c;
-        return *this;
- 
+
+    Matrix<T> c(m_Rows, m_Cols);
+    for (int i = 0; i < m_Rows; i++)
+        for (int j = 0; j < m_Cols; j++)
+            c[i][j] = m_Data[i][j] + b;
+    *this = c;
+    return *this;
 }
 
 template <typename T>
@@ -422,4 +448,59 @@ inline Matrix<T> Matrix<T>::operator*(Matrix<T> &b)
     else
         return *this;
 }
+
+template <typename T>
+inline Matrix<T> Matrix<T>::operator-(Matrix<T> b)
+{
+    if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
+    {
+        Matrix<T> c(m_Rows, m_Cols);
+        for (int i = 0; i < m_Rows; i++)
+            for (int j = 0; j < m_Cols; j++)
+                c[i][j] = m_Data[i][j] - b[i][j];
+        return c;
+    }
+
+    else
+        return *this;
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::operator-(T b)
+{
+
+    Matrix<T> c(m_Rows, m_Cols);
+    for (int i = 0; i < m_Rows; i++)
+        for (int j = 0; j < m_Cols; j++)
+            c[i][j] = m_Data[i][j] - b;
+    return c;
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::operator-=(Matrix<T> b)
+{
+    if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
+    {
+        Matrix<T> c(m_Rows, m_Cols);
+        for (int i = 0; i < m_Rows; i++)
+            for (int j = 0; j < m_Cols; j++)
+                c[i][j] = m_Data[i][j] - b[i][j];
+        *this = c;
+    }
+
+    return *this;
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::operator-=(T b)
+{
+
+    Matrix<T> c(m_Rows, m_Cols);
+    for (int i = 0; i < m_Rows; i++)
+        for (int j = 0; j < m_Cols; j++)
+            c[i][j] = m_Data[i][j] - b;
+    *this = c;
+    return *this;
+}
+
 #endif
