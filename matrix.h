@@ -136,7 +136,7 @@ public:
     MatrixRow(size_t);
     ~MatrixRow();
     void resize(size_t size);
-    void assign(size_t size, const value_type &val);
+    void assign(size_t size, T val);
     size_t size();
     size_t capacity();
     T &operator[](int i);
@@ -178,7 +178,7 @@ inline void MatrixRow<T>::resize(size_t newSize)
     for (size_t i = 0; i < newSize; i++)
         newBlock[i] = NULL;
     if (newSize > m_Size)
-        for (int i = 0; i < m_Size; i++)
+        for (size_t i = 0; i < m_Size; i++)
             newBlock[i] = std::move(m_Data[i]);
     else
         newBlock = std::move(m_Data);
@@ -188,7 +188,7 @@ inline void MatrixRow<T>::resize(size_t newSize)
 }
 
 template <typename T>
-inline void MatrixRow<T>::assign(size_t size, const value_type &val)
+inline void MatrixRow<T>::assign(size_t size, T val)
 {
     resize(size);
     std::fill(begin(), end(), val);
@@ -231,7 +231,8 @@ public:
     void assign(int row_count, int col_count, T val);
     Matrix<T> SigmoidMatrix();
     Matrix<T> Randomize();
-    Matrix<T> CreateDeterminate();
+    Matrix<T> CreateIdentityMatrix();
+    Matrix<T> ZeroMatrix();
     MatrixRow<T> &operator[](int i);
     Matrix<T> operator*(Matrix<T> &b);
     Matrix<T> operator+(Matrix<T> b);
@@ -309,21 +310,20 @@ inline size_t Matrix<T>::capacity()
 template <typename T>
 inline void Matrix<T>::resize(int row_count, int col_count)
 {
-    
-    m_Cols = col_count;
-    m_Size = m_Rows * m_Cols;
-    m_Capacity = m_Size * sizeof(T);
+
     MatrixRow<T> *newBlock = new MatrixRow<T>[row_count];
-    for (size_t i = 0; i < row_count; i++)
+    for (int i = 0; i < row_count; i++)
         newBlock[i] = NULL;
-            if (row_count > m_Rows)
+    if (row_count > m_Rows)
         for (int i = 0; i < m_Rows; i++)
             newBlock[i] = std::move(m_Data[i]);
     else
         newBlock = std::move(m_Data);
     m_Data = newBlock;
     m_Rows = row_count;
-
+    m_Cols = col_count;
+    m_Size = m_Rows * m_Cols;
+    m_Capacity = m_Size * sizeof(T);
     for (auto &i : *this)
         i.resize(m_Cols);
 }
@@ -362,12 +362,20 @@ inline Matrix<T> Matrix<T>::Randomize()
 }
 
 template <typename T>
-inline Matrix<T> Matrix<T>::CreateDeterminate()
+inline Matrix<T> Matrix<T>::CreateIdentityMatrix()
 {
     this->assign(m_Rows, m_Cols, 0);
     for (int i = 0; i < m_Rows; i++)
         m_Data[i][i] = 1;
 
+    return *this;
+}
+
+
+template<typename T>
+inline Matrix<T> Matrix<T>::ZeroMatrix()
+{
+    this->assign(m_Rows, m_Cols, 0);
     return *this;
 }
 
