@@ -229,6 +229,7 @@ public:
     size_t capacity();
     void resize(int row_count, int col_count);
     void assign(int row_count, int col_count, T val);
+    void assign(T val);
     Matrix<T> SigmoidMatrix();
     Matrix<T> Randomize();
     Matrix<T> CreateIdentityMatrix();
@@ -338,6 +339,14 @@ inline void Matrix<T>::assign(int row_count, int col_count, T val)
 }
 
 template <typename T>
+inline void Matrix<T>::assign(T val)
+{
+    for (auto i : *this)
+        for (auto &j : i)
+            j = val;
+}
+
+template <typename T>
 inline Matrix<T> Matrix<T>::SigmoidMatrix()
 {
     for (auto i : *this)
@@ -364,18 +373,19 @@ inline Matrix<T> Matrix<T>::Randomize()
 template <typename T>
 inline Matrix<T> Matrix<T>::CreateIdentityMatrix()
 {
-    this->assign(m_Rows, m_Cols, 0);
-    for (int i = 0; i < m_Rows; i++)
-        m_Data[i][i] = 1;
-
+    if (m_Rows == m_Cols)
+    {
+        this->ZeroMatrix();
+        for (int i = 0; i < m_Rows; i++)
+            m_Data[i][i] = 1;
+    }
     return *this;
 }
 
-
-template<typename T>
+template <typename T>
 inline Matrix<T> Matrix<T>::ZeroMatrix()
 {
-    this->assign(m_Rows, m_Cols, 0);
+    this->assign(0);
     return *this;
 }
 
