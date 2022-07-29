@@ -231,6 +231,7 @@ public:
     void assign(int row_count, int col_count, T val);
     void assign(T val);
     Matrix<T> MergeVertical(Matrix<T> &b);
+    Matrix<T>MergeHorizontal(Matrix<T> &b);
     Matrix<T> SigmoidMatrix();
     Matrix<T> Randomize();
     Matrix<T> CreateIdentityMatrix();
@@ -357,6 +358,19 @@ inline Matrix<T> Matrix<T>::MergeVertical(Matrix<T> &b)
             m_Data[i] = std::move(b.m_Data[i - (m_Rows / 2)]);
     }
     return *this;
+}
+
+template <typename T>
+inline Matrix<T>Matrix<T>::MergeHorizontal(Matrix<T> &b)
+{
+    if(m_Rows == b.m_Rows)
+    {
+        this->resize(m_Rows, m_Cols *2);
+        for(int i=0; i<m_Rows; i++)
+            for(int j= (m_Cols /2); j<m_Cols; j++)
+                m_Data[i][j] = std::move(b.m_Data[i][j-(m_Cols/2)]);
+    }
+        return *this;
 }
 
 template <typename T>
