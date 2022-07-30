@@ -242,6 +242,8 @@ public:
     Matrix<T> ZeroMatrix();
     MatrixRow<T> &operator[](int i);
     Matrix<T> operator*(Matrix<T> &b);
+    Matrix<T> operator*(T b);
+    Matrix<T> operator*=(T b);
     Matrix<T> operator+(Matrix<T> b);
     Matrix<T> operator+(T b);
     Matrix<T> operator+=(Matrix<T> b);
@@ -555,6 +557,29 @@ inline Matrix<T> Matrix<T>::operator*(Matrix<T> &b)
 
     else
         return *this;
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::operator*(T b)
+{
+
+    Matrix<T> c(m_Rows, m_Cols);
+    for (int i = 0; i < m_Rows; i++)
+        for (int j = 0; j < m_Cols; j++)
+            c[i][j] = m_Data[i][j] * b;
+    return c;
+}
+
+template <typename T>
+inline Matrix<T> Matrix<T>::operator*=(T b)
+{
+
+    Matrix<T> c(m_Rows, m_Cols);
+    for (int i = 0; i < m_Rows; i++)
+        for (int j = 0; j < m_Cols; j++)
+            c[i][j] = m_Data[i][j] * b;
+    *this = c;
+    return *this;
 }
 
 template <typename T>
