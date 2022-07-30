@@ -231,7 +231,10 @@ public:
     void assign(int row_count, int col_count, T val);
     void assign(T val);
     Matrix<T> MergeVertical(Matrix<T> &b);
-    Matrix<T>MergeHorizontal(Matrix<T> &b);
+    Matrix<T> MergeHorizontal(Matrix<T> &b);
+    Matrix<T> *SplitVertical();
+    Matrix<T> *SplitVertical(int num);
+    Matrix<T> *SplitHorizontal();
     Matrix<T> SigmoidMatrix();
     Matrix<T> Randomize();
     Matrix<T> CreateIdentityMatrix();
@@ -361,16 +364,44 @@ inline Matrix<T> Matrix<T>::MergeVertical(Matrix<T> &b)
 }
 
 template <typename T>
-inline Matrix<T>Matrix<T>::MergeHorizontal(Matrix<T> &b)
+inline Matrix<T> Matrix<T>::MergeHorizontal(Matrix<T> &b)
 {
-    if(m_Rows == b.m_Rows)
+    if (m_Rows == b.m_Rows)
     {
-        this->resize(m_Rows, m_Cols *2);
-        for(int i=0; i<m_Rows; i++)
-            for(int j= (m_Cols /2); j<m_Cols; j++)
-                m_Data[i][j] = std::move(b.m_Data[i][j-(m_Cols/2)]);
+        this->resize(m_Rows, m_Cols * 2);
+        for (int i = 0; i < m_Rows; i++)
+            for (int j = (m_Cols / 2); j < m_Cols; j++)
+                m_Data[i][j] = std::move(b.m_Data[i][j - (m_Cols / 2)]);
     }
-        return *this;
+    return *this;
+}
+
+template <typename T>
+inline Matrix<T> *Matrix<T>::SplitVertical()
+{
+    Matrix<T> *split_matrix = new Matrix<T>[2];
+    split_matrix[0].resize(m_Rows / 2, m_Cols);
+    split_matrix[1].resize(m_Rows / 2, m_Cols);
+    for (int i = 0; i < m_Rows / 2; i++)
+        split_matrix[0][i] = std::move(m_Data[i]);
+    for (int i = m_Rows / 2; i < m_Rows; i++)
+        split_matrix[1][i - (m_Rows / 2)] = std::move(m_Data[i]);
+    return split_matrix;
+}
+
+template <typename T>
+inline Matrix<T> *Matrix<T>::SplitVertical(int num)
+{
+    Matrix<T> *split_matrix = new Matrix<T>[num];
+
+    for (int i = 0; i < num; i++)
+        split_matrix[i].resize(m_Rows / num, m_Cols);
+
+    for (int j = 0; j < num; j++)
+        for (int i = 0; i < m_Rows / num; i++)
+            split_matrix[j][i] = std::move(m_Data[j + i]);
+
+    return split_matrix;
 }
 
 template <typename T>
