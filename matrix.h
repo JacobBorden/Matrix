@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <time.h>
 
+namespace Matrix{
+
+
 template <typename MatrixRow>
 class MatrixRowIterator
 {
@@ -660,5 +663,5 @@ inline Matrix<T> Matrix<T>::operator/=(T b)
     *this = c;
     return *this;
 }
-
+}
 #endif
