@@ -235,6 +235,7 @@ public:
     Matrix<T> *SplitVertical();
     Matrix<T> *SplitVertical(int num);
     Matrix<T> *SplitHorizontal();
+    Matrix<T> *SplitHorizontal(int num);
     Matrix<T> SigmoidMatrix();
     Matrix<T> Randomize();
     Matrix<T> CreateIdentityMatrix();
@@ -399,7 +400,38 @@ inline Matrix<T> *Matrix<T>::SplitVertical(int num)
 
     for (int j = 0; j < num; j++)
         for (int i = 0; i < m_Rows / num; i++)
-            split_matrix[j][i] = std::move(m_Data[j + i]);
+            split_matrix[j][i] = std::move(m_Data[(j * (m_Rows / num)) + i]);
+
+    return split_matrix;
+}
+
+template <typename T>
+inline Matrix<T> *Matrix<T>::SplitHorizontal()
+{
+    Matrix<T> *split_matrix = new Matrix<T>[2];
+    split_matrix[0].resize(m_Rows, m_Cols / 2);
+    split_matrix[1].resize(m_Rows, m_Cols / 2);
+    for (int i = 0; i < m_Rows; i++)
+    {
+        for (int j = 0; j < m_Cols / 2; j++)
+            split_matrix[0][i][j] = std::move(m_Data[i][j]);
+        for (int j = m_Cols / 2; j < m_Cols; j++)
+            split_matrix[0][i][j - (m_Cols / 2)] = std::move(m_Data[i][j]);
+    }
+    return split_matrix;
+}
+
+template <typename T>
+inline Matrix<T> *Matrix<T>::SplitHorizontal(int num)
+{
+    Matrix<T> *split_matrix = new Matrix<T>[num];
+    for (int i = 0; i < num; i++)
+        split_matrix[i].resize(m_Rows, m_Cols / num);
+
+    for (int i = 0; i < num; i++)
+        for (int j = 0; j < m_Rows; j++)
+            for (int k = 0; k < m_Cols / num; k++)
+                split_matrix[i][j][k] = std::move(m_Data[j][(i * (m_Cols / num)) + k]);
 
     return split_matrix;
 }
