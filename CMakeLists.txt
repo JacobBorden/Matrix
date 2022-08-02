@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 
-add_library(matrix matrix.h)
+add_library(matrix STATIC matrix.h)
 set_target_properties(matrix PROPERTIES LINKER_LANGUAGE CXX)
 
 
