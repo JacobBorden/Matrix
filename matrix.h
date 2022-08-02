@@ -166,7 +166,6 @@ namespace Matrix
         m_Data = new T[size];
         m_Size = size;
         m_Capacity = sizeof(T) * m_Size;
-        std::fill(begin(), end(), NULL);
     }
 
     template <typename T>
