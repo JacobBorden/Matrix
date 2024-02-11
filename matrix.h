@@ -1,10 +1,11 @@
 #pragma once
+#include <cstddef>
 #ifndef MATRIX_H
 #define MATRIX_H
 
 #include <algorithm>
 #include <time.h>
-
+#include <iterator>
 namespace Matrix
 {
 
@@ -15,7 +16,8 @@ namespace Matrix
         using value_type = typename MatrixRow::value_type;
         using pointer = value_type *;
         using reference = value_type &;
-
+	using iterator_category = std::random_access_iterator_tag;
+	using difference_type = std::ptrdiff_t;
         MatrixRowIterator(pointer ptr) : m_ptr(ptr) {}
 
         MatrixRowIterator &operator++()
@@ -31,6 +33,13 @@ namespace Matrix
             return it;
         }
 
+	MatrixRowIterator operator+(difference_type n) const { return MatrixRowIterator(m_ptr +n);}
+
+	MatrixRowIterator& operator+= (difference_type n){
+		m_ptr +=n;
+		return *this;
+	}
+
         MatrixRowIterator &operator--()
         {
             m_ptr--;
@@ -43,18 +52,36 @@ namespace Matrix
             --*this;
             return it;
         }
+	
+	MatrixRowIterator operator-(difference_type n) const { return MatrixRowIterator(m_ptr - n);}
+
+	MatrixRowIterator& operator-=(difference_type n){
+		m_ptr -= n;
+		return *this;
+	}
+
+	difference_type operator-(const MatrixRowIterator& other) const { return m_ptr - other.m_ptr;}
+
 
         pointer operator->() const {return m_ptr;}
 
         reference operator*() {return *m_ptr;}
 	const reference operator*() const {return *m_ptr;}
 
-        bool operator==(const MatrixRowIterator other) const {return this->m_ptr == other.m_ptr;}
-        bool operator!=(const MatrixRowIterator other) const {return this->m_ptr != other.m_ptr;}
+        bool operator==(const MatrixRowIterator& other) const {return this->m_ptr == other.m_ptr;}
+        bool operator!=(const MatrixRowIterator& other) const {return this->m_ptr != other.m_ptr;}
+
+	bool operator<(const MatrixRowIterator& other) const {return m_ptr < other.m_ptr;}
+	bool operator<=(const MatrixRowIterator& other) const {return m_ptr <= other.m_ptr;}
+	bool operator>(const MatrixRowIterator& other) const {return m_ptr > other.m_ptr;}
+	bool operator>=(const MatrixRowIterator& other) const {return m_ptr >= other.m_ptr;}
+	reference operator[](difference_type n) const { return *(*this +n);}
 
     private:
         pointer m_ptr;
     };
+
+//--------------------------------------------------------------------------
 
     template <typename Matrix>
     class MatrixIterator
@@ -81,7 +108,8 @@ namespace Matrix
 
         MatrixIterator &operator--()
         {
-            m_ptr-- return *this;
+            m_ptr--; 
+	    return *this;
         }
 
         MatrixIterator operator--(int)
