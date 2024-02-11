@@ -44,25 +44,13 @@ namespace Matrix
             return it;
         }
 
-        pointer operator->()
-        {
-            return m_ptr;
-        }
+        pointer operator->() const {return m_ptr;}
 
-        reference operator*()
-        {
-            return *m_ptr;
-        }
+        reference operator*() {return *m_ptr;}
+	const reference operator*() const {return *m_ptr;}
 
-        bool operator==(MatrixRowIterator other)
-        {
-            return this->m_ptr == other.m_ptr;
-        }
-
-        bool operator!=(MatrixRowIterator other)
-        {
-            return this->m_ptr != other.m_ptr;
-        }
+        bool operator==(const MatrixRowIterator other) const {return this->m_ptr == other.m_ptr;}
+        bool operator!=(const MatrixRowIterator other) const {return this->m_ptr != other.m_ptr;}
 
     private:
         pointer m_ptr;
