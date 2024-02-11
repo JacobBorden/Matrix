@@ -27,7 +27,7 @@ namespace Matrix
         MatrixRowIterator operator++(int)
         {
             MatrixRowIterator it = *this;
-            ++(this);
+            ++*this;
             return it;
         }
 
@@ -40,7 +40,7 @@ namespace Matrix
         MatrixRowIterator operator--(int)
         {
             MatrixRowIterator it = *this;
-            --(this);
+            --*this;
             return it;
         }
 
