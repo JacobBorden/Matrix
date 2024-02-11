@@ -8,79 +8,89 @@
 #include <iterator>
 namespace Matrix
 {
+template <typename MatrixRow>
+class MatrixRowIterator {
+public:
+    // Member type definitions to conform to iterator requirements
+    using value_type = typename MatrixRow::value_type; // Type of elements the iterator refers to
+    using pointer = value_type*; // Pointer to the element type
+    using reference = value_type&; // Reference to the element type
+    using iterator_category = std::random_access_iterator_tag; // Iterator category to support random access
+    using difference_type = std::ptrdiff_t; // Type to express the difference between two iterators
 
-    template <typename MatrixRow>
-    class MatrixRowIterator
-    {
-    public:
-        using value_type = typename MatrixRow::value_type;
-        using pointer = value_type *;
-        using reference = value_type &;
-	using iterator_category = std::random_access_iterator_tag;
-	using difference_type = std::ptrdiff_t;
-        MatrixRowIterator(pointer ptr) : m_ptr(ptr) {}
+    // Constructor initializes the iterator with a pointer to a matrix row element
+    MatrixRowIterator(pointer ptr) : m_ptr(ptr) {}
 
-        MatrixRowIterator &operator++()
-        {
-            m_ptr++;
-            return *this;
-        }
+    // Pre-increment operator advances the iterator to the next element and returns a reference to the updated iterator
+    MatrixRowIterator& operator++() {
+        m_ptr++;
+        return *this;
+    }
 
-        MatrixRowIterator operator++(int)
-        {
-            MatrixRowIterator it = *this;
-            ++*this;
-            return it;
-        }
+    // Post-increment operator advances the iterator to the next element and returns the iterator before advancement
+    MatrixRowIterator operator++(int) {
+        MatrixRowIterator it = *this;
+        ++*this;
+        return it;
+    }
 
-	MatrixRowIterator operator+(difference_type n) const { return MatrixRowIterator(m_ptr +n);}
+    // Addition operator returns a new iterator advanced by 'n' positions
+    MatrixRowIterator operator+(difference_type n) const { return MatrixRowIterator(m_ptr + n); }
 
-	MatrixRowIterator& operator+= (difference_type n){
-		m_ptr +=n;
-		return *this;
-	}
+    // Compound addition operator advances the iterator by 'n' positions and returns a reference to the updated iterator
+    MatrixRowIterator& operator+=(difference_type n) {
+        m_ptr += n;
+        return *this;
+    }
 
-        MatrixRowIterator &operator--()
-        {
-            m_ptr--;
-            return *this;
-        }
+    // Pre-decrement operator moves the iterator to the previous element and returns a reference to the updated iterator
+    MatrixRowIterator& operator--() {
+        m_ptr--;
+        return *this;
+    }
 
-        MatrixRowIterator operator--(int)
-        {
-            MatrixRowIterator it = *this;
-            --*this;
-            return it;
-        }
-	
-	MatrixRowIterator operator-(difference_type n) const { return MatrixRowIterator(m_ptr - n);}
+    // Post-decrement operator moves the iterator to the previous element and returns the iterator before movement
+    MatrixRowIterator operator--(int) {
+        MatrixRowIterator it = *this;
+        --*this;
+        return it;
+    }
 
-	MatrixRowIterator& operator-=(difference_type n){
-		m_ptr -= n;
-		return *this;
-	}
+    // Subtraction operator returns a new iterator moved back by 'n' positions
+    MatrixRowIterator operator-(difference_type n) const { return MatrixRowIterator(m_ptr - n); }
 
-	difference_type operator-(const MatrixRowIterator& other) const { return m_ptr - other.m_ptr;}
+    // Compound subtraction operator moves the iterator back by 'n' positions and returns a reference to the updated iterator
+    MatrixRowIterator& operator-=(difference_type n) {
+        m_ptr -= n;
+        return *this;
+    }
 
+    // Subtraction operator calculates the difference between two iterators
+    difference_type operator-(const MatrixRowIterator& other) const { return m_ptr - other.m_ptr; }
 
-        pointer operator->() const {return m_ptr;}
+    // Arrow operator provides access to the element's members the iterator points to
+    pointer operator->() const { return m_ptr; }
 
-        reference operator*() {return *m_ptr;}
-	const reference operator*() const {return *m_ptr;}
+    // Dereference operators return a (const) reference to the element the iterator points to
+    reference operator*() { return *m_ptr; }
+    const reference operator*() const { return *m_ptr; }
 
-        bool operator==(const MatrixRowIterator& other) const {return this->m_ptr == other.m_ptr;}
-        bool operator!=(const MatrixRowIterator& other) const {return this->m_ptr != other.m_ptr;}
+    // Comparison operators for equality and inequality checks between iterators
+    bool operator==(const MatrixRowIterator& other) const { return m_ptr == other.m_ptr; }
+    bool operator!=(const MatrixRowIterator& other) const { return m_ptr != other.m_ptr; }
 
-	bool operator<(const MatrixRowIterator& other) const {return m_ptr < other.m_ptr;}
-	bool operator<=(const MatrixRowIterator& other) const {return m_ptr <= other.m_ptr;}
-	bool operator>(const MatrixRowIterator& other) const {return m_ptr > other.m_ptr;}
-	bool operator>=(const MatrixRowIterator& other) const {return m_ptr >= other.m_ptr;}
-	reference operator[](difference_type n) const { return *(*this +n);}
+    // Relational operators compare the positions of two iterators
+    bool operator<(const MatrixRowIterator& other) const { return m_ptr < other.m_ptr; }
+    bool operator<=(const MatrixRowIterator& other) const { return m_ptr <= other.m_ptr; }
+    bool operator>(const MatrixRowIterator& other) const { return m_ptr > other.m_ptr; }
+    bool operator>=(const MatrixRowIterator& other) const { return m_ptr >= other.m_ptr; }
 
-    private:
-        pointer m_ptr;
-    };
+    // Subscript operator provides random access to elements relative to the current iterator position
+    reference operator[](difference_type n) const { return *(*this + n); }
 
+private:
+    pointer m_ptr; // Internal pointer to the current element
+};
 //--------------------------------------------------------------------------
 
     template <typename Matrix>
