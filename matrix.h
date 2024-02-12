@@ -96,73 +96,92 @@ private:
 template <typename T>
 class MatrixColumnIterator {
 public:
-    using value_type = T;
-    using pointer = T*;
-    using reference = T&;
-    using iterator_category = std::random_access_iterator_tag;
-    using difference_type = std::ptrdiff_t;
+    // Type aliases for iterator traits
+    using value_type = T; // Type of elements the iterator can dereference
+    using pointer = T*; // Pointer to the element type
+    using reference = T&; // Reference to the element type
+    using iterator_category = std::random_access_iterator_tag; // Iterator category defining the capabilities of the iterator
+    using difference_type = std::ptrdiff_t; // Type to express the difference between two iterators
 
-    // Constructor needs the starting pointer and the total number of columns in the matrix
+    // Constructor initializes the iterator with a pointer to a matrix element and the total number of columns in the matrix
     MatrixColumnIterator(pointer ptr, size_t totalColumns) : m_ptr(ptr), m_totalColumns(totalColumns) {}
 
-    // Move to the next element in the column
+    // Pre-increment operator advances the iterator to the next element in the column and returns a reference to the updated iterator
     MatrixColumnIterator& operator++() {
-        m_ptr += m_totalColumns;
+        m_ptr += m_totalColumns; // Move pointer down one row in the current column
         return *this;
     }
 
-    MatrixColumnIterator& operator++(int){
-	    MatrixColumnIterator it = *this;
-	    m_ptr += m_totalColumns;
-	    return it;
+    // Post-increment operator advances the iterator to the next element in the column and returns the iterator before the increment
+    MatrixColumnIterator operator++(int) {
+        MatrixColumnIterator it = *this; // Make a copy of the current iterator
+        m_ptr += m_totalColumns; // Move pointer down one row in the current column
+        return it; // Return the copy representing the iterator before increment
     }
-    
+
+    // Addition operator returns a new iterator advanced by 'n' positions in the column
     MatrixColumnIterator operator+(difference_type n) const {
-    return MatrixColumnIterator(m_ptr + (n * m_totalColumns), m_totalColumns);
-}
-	MatrixColumnIterator& operator+=(difference_type n){
-		m_ptr += (n * m_totalColumns);
-		return *this;
-	}
-
-
-    MatrixColumnIterator& operator--(){
-	    m_ptr -= m_totalColumns;
-	    return *this;
+        return MatrixColumnIterator(m_ptr + (n * m_totalColumns), m_totalColumns); // Calculate new position and create a new iterator
     }
-     MatrixColumnIterator& operator--(int){
-	    MatrixColumnIterator it = *this;
-	    m_ptr -= m_totalColumns;
-	    return it;
+
+    // Compound addition operator advances the iterator by 'n' positions in the column and returns a reference to the updated iterator
+    MatrixColumnIterator& operator+=(difference_type n) {
+        m_ptr += (n * m_totalColumns); // Adjust pointer by 'n' rows down in the current column
+        return *this;
     }
-    MatrixColumnIterator& operator-=(difference_type n){
-		m_ptr -= (n * m_totalColumns);
-		return *this;
-	}
+
+    // Pre-decrement operator moves the iterator to the previous element in the column and returns a reference to the updated iterator
+    MatrixColumnIterator& operator--() {
+        m_ptr -= m_totalColumns; // Move pointer up one row in the current column
+        return *this;
+    }
+
+    // Post-decrement operator moves the iterator to the previous element in the column and returns the iterator before the decrement
+    MatrixColumnIterator operator--(int) {
+        MatrixColumnIterator it = *this; // Make a copy of the current iterator
+        m_ptr -= m_totalColumns; // Move pointer up one row in the current column
+        return it; // Return the copy representing the iterator before decrement
+    }
+
+    // Subtraction operator returns a new iterator moved back by 'n' positions in the column
     MatrixColumnIterator operator-(difference_type n) const {
-    return MatrixColumnIterator(m_ptr - (n * m_totalColumns), m_totalColumns);
-	
-    difference_type operator- (const MatrixColumnIterator& other) const { return m_ptr - other.m_ptr;}
+        return MatrixColumnIterator(m_ptr - (n * m_totalColumns), m_totalColumns); // Calculate new position and create a new iterator
+    }
 
-    // Comparison operators for equality and inequality checks between iterators
+    // Compound subtraction operator moves the iterator back by 'n' positions in the column and returns a reference to the updated iterator
+    MatrixColumnIterator& operator-=(difference_type n) {
+        m_ptr -= (n * m_totalColumns); // Adjust pointer by 'n' rows up in the current column
+        return *this;
+    }
+
+    // Subtraction operator calculates the difference between two iterators in terms of column positions
+    difference_type operator-(const MatrixColumnIterator& other) const {
+        return (m_ptr - other.m_ptr) / m_totalColumns; // Calculate element-wise distance between iterators
+    }
+
+    // Comparison operators for checking equality and inequality between iterators
     bool operator==(const MatrixColumnIterator& other) const { return m_ptr == other.m_ptr; }
     bool operator!=(const MatrixColumnIterator& other) const { return m_ptr != other.m_ptr; }
 
-    // Relational operators compare the positions of two iterators
+    // Relational operators for ordering iterators
     bool operator<(const MatrixColumnIterator& other) const { return m_ptr < other.m_ptr; }
     bool operator<=(const MatrixColumnIterator& other) const { return m_ptr <= other.m_ptr; }
     bool operator>(const MatrixColumnIterator& other) const { return m_ptr > other.m_ptr; }
     bool operator>=(const MatrixColumnIterator& other) const { return m_ptr >= other.m_ptr; }
 
-    // Dereference the iterator
+    // Dereference operator provides access to the current element the iterator points to
     reference operator*() const { return *m_ptr; }
-	pointer operator->() const { return m_ptr;}
-	reference operator[](difference_type n) const {return *(*this + n);}
-private:
-    pointer m_ptr;
-    size_t m_totalColumns; // Number of columns in the matrix to navigate column-wise
-};
 
+    // Member access operator allows access to the element's members
+    pointer operator->() const { return m_ptr; }
+
+    // Subscript operator provides random access to elements relative to the current iterator position
+    reference operator[](difference_type n) const { return *(*this + n); }
+
+private:
+    pointer m_ptr; // Pointer to the current element in the matrix
+    size_t m_totalColumns; // Total number of columns in the matrix, used for column-wise navigation
+};
 
 //--------------------------------------------------------------------------
     template <typename Matrix>
