@@ -132,7 +132,7 @@ public:
     }
      MatrixColumnIterator& operator--(int){
 	    MatrixColumnIterator it = *this;
-	    m_ptr += m_totalColumns;
+	    m_ptr -= m_totalColumns;
 	    return it;
     }
     MatrixColumnIterator& operator-=(difference_type n){
@@ -142,22 +142,22 @@ public:
     MatrixColumnIterator operator-(difference_type n) const {
     return MatrixColumnIterator(m_ptr - (n * m_totalColumns), m_totalColumns);
 	
-    difference_type operator- (const MatrixRowIterator& other) const { return m_ptr - other.m_ptr;}
+    difference_type operator- (const MatrixColumnIterator& other) const { return m_ptr - other.m_ptr;}
 
     // Comparison operators for equality and inequality checks between iterators
-    bool operator==(const MatrixRowIterator& other) const { return m_ptr == other.m_ptr; }
-    bool operator!=(const MatrixRowIterator& other) const { return m_ptr != other.m_ptr; }
+    bool operator==(const MatrixColumnIterator& other) const { return m_ptr == other.m_ptr; }
+    bool operator!=(const MatrixColumnIterator& other) const { return m_ptr != other.m_ptr; }
 
     // Relational operators compare the positions of two iterators
-    bool operator<(const MatrixRowIterator& other) const { return m_ptr < other.m_ptr; }
-    bool operator<=(const MatrixRowIterator& other) const { return m_ptr <= other.m_ptr; }
-    bool operator>(const MatrixRowIterator& other) const { return m_ptr > other.m_ptr; }
-    bool operator>=(const MatrixRowIterator& other) const { return m_ptr >= other.m_ptr; }
+    bool operator<(const MatrixColumnIterator& other) const { return m_ptr < other.m_ptr; }
+    bool operator<=(const MatrixColumnIterator& other) const { return m_ptr <= other.m_ptr; }
+    bool operator>(const MatrixColumnIterator& other) const { return m_ptr > other.m_ptr; }
+    bool operator>=(const MatrixColumnIterator& other) const { return m_ptr >= other.m_ptr; }
 
     // Dereference the iterator
     reference operator*() const { return *m_ptr; }
 	pointer operator->() const { return m_ptr;}
-	reference operator[](difference_type n) const {return *(*this + (n * m_totalColumns));}
+	reference operator[](difference_type n) const {return *(*this + n);}
 private:
     pointer m_ptr;
     size_t m_totalColumns; // Number of columns in the matrix to navigate column-wise
