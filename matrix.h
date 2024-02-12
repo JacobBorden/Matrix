@@ -93,6 +93,78 @@ private:
 };
 //--------------------------------------------------------------------------
 
+template <typename T>
+class MatrixColumnIterator {
+public:
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+
+    // Constructor needs the starting pointer and the total number of columns in the matrix
+    MatrixColumnIterator(pointer ptr, size_t totalColumns) : m_ptr(ptr), m_totalColumns(totalColumns) {}
+
+    // Move to the next element in the column
+    MatrixColumnIterator& operator++() {
+        m_ptr += m_totalColumns;
+        return *this;
+    }
+
+    MatrixColumnIterator& operator++(int){
+	    MatrixColumnIterator it = *this;
+	    m_ptr += m_totalColumns;
+	    return it;
+    }
+    
+    MatrixColumnIterator operator+(difference_type n) const {
+    return MatrixColumnIterator(m_ptr + (n * m_totalColumns), m_totalColumns);
+}
+	MatrixColumnIterator& operator+=(difference_type n){
+		m_ptr += (n * m_totalColumns);
+		return *this;
+	}
+
+
+    MatrixColumnIterator& operator--(){
+	    m_ptr -= m_totalColumns;
+	    return *this;
+    }
+     MatrixColumnIterator& operator--(int){
+	    MatrixColumnIterator it = *this;
+	    m_ptr += m_totalColumns;
+	    return it;
+    }
+    MatrixColumnIterator& operator-=(difference_type n){
+		m_ptr -= (n * m_totalColumns);
+		return *this;
+	}
+    MatrixColumnIterator operator-(difference_type n) const {
+    return MatrixColumnIterator(m_ptr - (n * m_totalColumns), m_totalColumns);
+	
+    difference_type operator- (const MatrixRowIterator& other) const { return m_ptr - other.m_ptr;}
+
+    // Comparison operators for equality and inequality checks between iterators
+    bool operator==(const MatrixRowIterator& other) const { return m_ptr == other.m_ptr; }
+    bool operator!=(const MatrixRowIterator& other) const { return m_ptr != other.m_ptr; }
+
+    // Relational operators compare the positions of two iterators
+    bool operator<(const MatrixRowIterator& other) const { return m_ptr < other.m_ptr; }
+    bool operator<=(const MatrixRowIterator& other) const { return m_ptr <= other.m_ptr; }
+    bool operator>(const MatrixRowIterator& other) const { return m_ptr > other.m_ptr; }
+    bool operator>=(const MatrixRowIterator& other) const { return m_ptr >= other.m_ptr; }
+
+    // Dereference the iterator
+    reference operator*() const { return *m_ptr; }
+	pointer operator->() const { return m_ptr;}
+	reference operator[](difference_type n) const {return *(*this + (n * m_totalColumns));}
+private:
+    pointer m_ptr;
+    size_t m_totalColumns; // Number of columns in the matrix to navigate column-wise
+};
+
+
+//--------------------------------------------------------------------------
     template <typename Matrix>
     class MatrixIterator
     {
