@@ -243,7 +243,7 @@ private:
     private:
         pointer m_ptr;
     };
-
+//-------------------------------------------------------------------------
     template <typename T>
     class MatrixRow
     {
@@ -284,10 +284,11 @@ private:
         m_Size = size;
         m_Capacity = sizeof(T) * m_Size;
     }
-
+	
     template <typename T>
     inline MatrixRow<T>::~MatrixRow()
     {
+	    delete[] m_Data;
     }
 
     template <typename T>
