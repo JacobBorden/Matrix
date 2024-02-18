@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <memory>
 #ifndef MATRIX_H
 #define MATRIX_H
 
@@ -266,7 +267,8 @@ private:
     private:
         size_t m_Size;
         size_t m_Capacity;
-        T *m_Data;
+        //T *m_Data;
+	std::unique_ptr<T[]> m_Data;
     };
 
     template <typename T>
@@ -294,17 +296,18 @@ private:
     template <typename T>
     inline void MatrixRow<T>::resize(size_t newSize)
     {
-        T *newBlock = new T[newSize];
-        for (size_t i = 0; i < newSize; i++)
-            newBlock[i] = NULL;
-        if (newSize > m_Size)
-            for (size_t i = 0; i < m_Size; i++)
-                newBlock[i] = std::move(m_Data[i]);
-        else
-            newBlock = std::move(m_Data);
-        m_Data = newBlock;
-        m_Size = newSize;
-        m_Capacity = sizeof(T) * m_Size;
+	    T* newBlock = new T[newSize];
+	    size_t minSize = std::min(newSize, m_Size);
+	    for(size_t i = 0; i < minSize; ++i){
+		    newBlock[i] = m_Data[i];
+	    }
+	    for (size_t i = minSize; i < newSize; ++i){
+		    newBlock[i] = T();
+	    }
+	    delete[] m_Data;
+	    m_Data = newBlock;
+	    m_Size = newSize;
+	    m_Capacity = newSize;
     }
 
     template <typename T>
@@ -331,7 +334,7 @@ private:
     {
         return m_Data[i];
     }
-
+//-------------------------------------------------------------------------
     template <typename T>
     class Matrix
     {
