@@ -263,7 +263,8 @@ private:
         T &operator[](int i);
         Iterator begin() { return Iterator(m_Data); }
         Iterator end() { return Iterator(m_Data + m_Size); }
-
+	Iterator begin() const {return Iterator(m_Data);}
+	Iterator end() const {return Iterator(m_Data + m_Size);}
     private:
         size_t m_Size;
         size_t m_Capacity;
