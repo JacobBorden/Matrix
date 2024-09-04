@@ -1,13 +1,15 @@
 #pragma once
-#include <cstddef>
-#include <memory>
-#include <stdexcept>
+
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include <cstddef>
+#include <memory>
+#include <stdexcept>
 #include <algorithm>
 #include <time.h>
 #include <iterator>
+
 namespace Matrix
 {
 template <typename MatrixRow>
@@ -292,6 +294,8 @@ bool operator!=(MatrixIterator other)
 private:
 pointer m_ptr;
 };
+
+
 //-------------------------------------------------------------------------
 template <typename T>
 class MatrixRow
@@ -300,109 +304,52 @@ public:
 using value_type = T;
 using Iterator = MatrixRowIterator<MatrixRow<T> >;
 
-public:
-MatrixRow();
-MatrixRow(size_t);
-~MatrixRow();
-void resize(size_t size);
-void assign(size_t size, T val);
-size_t size();
-size_t capacity();
-T at(int i);
-T &operator[] (int i);
-Iterator begin() {
-	return Iterator(m_Data);
+MatrixRow() = default;
+explicit MatrixRow(size_t size) : m_Size(size), m_Data(std::make_unique<T[]>(size)){}
+
+void resize(size_t newSize)
+{
+ auto newData = std::make_unique<T[]>(newSize);
+ std::copy_n(m_Data.get(), std::min(m_Size, newSize), newData.get());
+ m_Data = std::move(newData);
+ m_Size = newSize;
 }
-Iterator end() {
-	return Iterator(m_Data + m_Size);
+
+void assign(size_t size, T val){
+	resize(size);
+	std::fill_n(m_Data.get(), size, val)
 }
-Iterator begin() const {
-	return Iterator(m_Data);
+
+size_t size() const {return m_Size;}
+
+size_t capacity() {return m_Capacity};
+
+T at(size_t i){
+	if (i >= m__Size) throw std::out_of_range("Index out of range");
+	return m_Data[i];
 }
-Iterator end() const {
-	return Iterator(m_Data + m_Size);
+T &operator[] (size_t i){
+	if( i >= m_Size) throw std::out_of_range("Index out of range");
+	return m_Data[i];
 }
+
+const T &operator[] (size_t i) const{
+	if( i >= m_Size) throw std::out_of_range("Index out of range");
+	return m_Data[i];
+}
+
+Iterator begin() {return Iterator(m_Data.get());}
+Iterator end() {return Iterator(m_Data.get() + m_Size);}
+Iterator begin() const {return Iterator(m_Data.get());}
+Iterator end() const { return Iterator(m_Data.get() + m_Size);}
+
 private:
 size_t m_Size;
 size_t m_Capacity;
-//T *m_Data;
 std::unique_ptr<T[]> m_Data;
 };
 
-template <typename T>
-inline MatrixRow<T>::MatrixRow()
-{
-	m_Data = new T[0];
-	m_Size = 0;
-	m_Capacity = sizeof(T) * m_Size;
-}
 
-template <typename T>
-inline MatrixRow<T>::MatrixRow(size_t size)
-{
-	m_Data = new T[size];
-	m_Size = size;
-	m_Capacity = sizeof(T) * m_Size;
-}
-
-template <typename T>
-inline MatrixRow<T>::~MatrixRow()
-{
-	delete[] m_Data;
-}
-
-template <typename T>
-inline void MatrixRow<T>::resize(size_t newSize)
-{
-	T* newBlock = new T[newSize];
-	size_t minSize = std::min(newSize, m_Size);
-	for(size_t i = 0; i < minSize; ++i){
-		newBlock[i] = m_Data[i];
-	}
-	for (size_t i = minSize; i < newSize; ++i){
-		newBlock[i] = T();
-	}
-	delete[] m_Data;
-	m_Data = newBlock;
-	m_Size = newSize;
-	m_Capacity = newSize;
-}
-
-template <typename T>
-inline void MatrixRow<T>::assign(size_t size, T val)
-{
-	resize(size);
-	std::fill(begin(), end(), val);
-}
-
-template <typename T>
-inline size_t MatrixRow<T>::size()
-{
-	return m_Size;
-}
-
-template <typename T>
-inline size_t MatrixRow<T>::capacity()
-{
-	return m_Capacity;
-}
-
-template <typename T>
-inline T &MatrixRow<T>::operator[] (int i)
-{
-	if(i < 0 || static_cast<size_t>(i) >= m_Size)
-		throw std::out_of_range("Index out of range");
-	return m_Data[i];
-}
-
-template <typename T>
-inline T MatrixRow<T>::at(int i)
-{
-	if(i < 0 || static_cast<size_t>(i) >= m_Size)
-		throw std::out_of_range("Index out of range");
-	return m_Data[i];
-}
-//-------------------------------------------------------------------------
 template <typename T>
 class Matrix
 {
