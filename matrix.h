@@ -543,7 +543,7 @@ namespace Matrix
 			return result;
 		}
 
-		Matrix<T> SigmoidMatrix() const
+		Matrix<T> SigmoidMatrix()
 		{
 			Matrix<T> result(*this);
 			for (auto &row : result)
@@ -557,15 +557,17 @@ namespace Matrix
 
 		Matrix<T> Randomize()
 		{
-        static std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
-        std::uniform_real_distribution<> dis(-1.0, 1.0);
-        for (auto& row : *this) {
-            for (auto& elem : row) {
-                elem = dis(gen);
-            }
-        }
-        return *this;
-    }
+			static std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+			std::uniform_real_distribution<> dis(-1.0, 1.0);
+			for (auto &row : *this)
+			{
+				for (auto &elem : row)
+				{
+					elem = dis(gen);
+				}
+			}
+			return *this;
+		}
 		Matrix<T> CreateIdentityMatrix()
 		{
 			if (m_Rows != m_Cols)
@@ -578,13 +580,22 @@ namespace Matrix
 			return *this
 		}
 
-		Matrix<T> ZeroMatrix()
+		Matrix<T> ZeroMatrix() const
 		{
 			for (auto &row : *this)
 			{
 				std::fill(row.begin(), row.end(), T(0);)
 			}
 			return *this;
+		}
+
+		Matrix<T> Transpose() const
+		{
+			Matrix<T> result(m_Cols, m_Rows);
+			for (size_t i = 0; i < m_Rows, ++i)
+				for (size_t j = 0; j < m_Cols; ++j)
+					result[j][i] = m_Data[i][j];
+			return result;
 		}
 
 		MatrixRow<T> &operator[](size_t i) { return m_Data[i]; }
