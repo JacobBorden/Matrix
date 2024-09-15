@@ -292,31 +292,6 @@ int main() {
     return 0;
 }
 
-```cpp
-#include "Matrix.h"
-
-int main() {
-    Matrix::Matrix<int> mat1(3, 3);
-    Matrix::Matrix<int> mat2(3, 3);
-
-    // Initialize matrices
-    mat1.assign(2);
-    mat2.assign(3);
-
-    // Add matrices
-    Matrix::Matrix<int> result = mat1 + mat2;
-
-    // Output the result
-    for (size_t i = 0; i < result.rows(); ++i) {
-        for (size_t j = 0; j < result.cols(); ++j) {
-            std::cout << result[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    return 0;
-}
-
 ```
 
 ### Example 2: Matrix Addition
