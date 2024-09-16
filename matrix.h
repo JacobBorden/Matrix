@@ -598,6 +598,26 @@ namespace Matrix
 			return result;
 		}
 
+		T Determinant() const
+		{
+			if (m_Rows != m_Cols)
+				throw std::invalid_argument("Matrix must be square");
+			size_t n = m_Rows;
+			if (n == 1)
+				return m_Data[0][0];
+			else if (n == 2)
+				return m_Data[0][0] * m_Data[1][1] - m_Data[0][1] * m_Data[1][0];
+			T det = 0;
+			for (size_t = 0; i < n; ++i)
+			{
+				Matrix<T> minor = getMinor(*this, 0, i);
+				int sign = ((i % 2) == 0) ? 1 : -1;
+				det += sign * matrix[0][i] * minor.Determinant();
+			}
+
+			return det;
+		}
+
 		MatrixRow<T> &operator[](size_t i) { return m_Data[i]; }
 		const MatrixRow<T> &operator[](size_t i) const { return m_Data[i]; }
 
@@ -753,6 +773,35 @@ namespace Matrix
 		Iterator end() { return Iterator(m_Data + m_Rows); }
 
 	private:
+		Matrix<T> getMinor(const Matrix<T> &matrix, size_t row_to_remove, size_t col_to_remove) const
+		{
+			if (matrix.m_Rows != matrix.m_Cols)
+				throw std::invalid_argument("Matrix must be square to compute minor.");
+
+			size_t n = matrix.m_Rows;
+			Matrix<T> minor_matrix(n - 1, n - 1);
+
+			size_t minor_i = 0; // Row index for minor_matrix
+			for (size_t i = 0; i < n; ++i)
+			{
+				if (i == row_to_remove)
+					continue;
+
+				size_t minor_j = 0; // Column index for minor_matrix
+				for (size_t j = 0; j < n; ++j)
+				{
+					if (j == col_to_remove)
+						continue;
+
+					minor_matrix[minor_i][minor_j] = matrix.m_Data[i][j];
+					++minor_j;
+				}
+				++minor_i;
+			}
+
+			return minor_matrix;
+		}
+
 		size_t m_Rows = 0;
 		size_t m_Cols = 0;
 		size_t m_Size = 0;
