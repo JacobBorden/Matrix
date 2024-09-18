@@ -241,6 +241,7 @@ A template class representing a two-dimensional matrix composed of `MatrixRow<T>
   - `Matrix<T> ZeroMatrix() const`: Sets all elements to zero.
   - `Matrix<T> Transpose() const`: Returns the transpose of the matrix.
   - `T Determinant() const`: Returns the determinant of the matrix.
+  - `Matrix<T> Inverse()`: Returns the inverse of the matrix.
 
 - **Operators**
   - `MatrixRow<T>& operator[](size_t i)`: Accesses the row at index `i`.

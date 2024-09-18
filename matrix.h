@@ -618,196 +618,230 @@ namespace Matrix
 			return det;
 		}
 
-		MatrixRow<T> &operator[](size_t i) { return m_Data[i]; }
-		const MatrixRow<T> &operator[](size_t i) const { return m_Data[i]; }
-
-		Matrix<T> operator+(const Matrix<T> &b)
+		Matrix<T> Inverse() const
 		{
-			if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
+			if (m_Rows != m_Cols)
+				throw std::invalid_argument("Matrix must be square");
+
+			T det = Determinant();
+			if (det == 0)
+				throw std::runtime_error("Matrix is singular and cannot be inverted.");
+
+			// Step 2: Compute the cofactor matrix
+			Matrix<T> cofactors(m_Rows, m_Cols);
+			for (size_t i = 0; i < m_Rows; ++i)
 			{
-				Matrix<T> c(m_Rows, m_Cols);
-				for (int i = 0; i < m_Rows; i++)
-					for (int j = 0; j < m_Cols; j++)
-						c[i][j] = m_Data[i][j] + b[i][j];
-				return c;
+				for (size_t j = 0; j < m_Cols; ++j)
+				{
+					Matrix<T> minor = getMinor(*this, i, j);
+					T minor_det = minor.Determinant();
+					cofactors[i][j] = ((i + j) % 2 == 0 ? 1 : -1) * minor_det;
+				}
 			}
 
-			else
-				return *this;
+			// Step 3: Compute the adjugate matrix (transpose of cofactor matrix)
+			Matrix<T> adjugate = cofactors.Transpose();
+
+			// Step 4: Compute the inverse
+			Matrix<T> inverse = adjugate * (1 / det);
+			return inverse;
 		}
-		Matrix<T> operator+(const T b) const
+
+	
+
+	MatrixRow<T> &
+	operator[](size_t i)
+	{
+		return m_Data[i];
+	}
+	const MatrixRow<T> &operator[](size_t i) const { return m_Data[i]; }
+
+	Matrix<T> operator+(const Matrix<T> &b)
+	{
+		if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
 		{
 			Matrix<T> c(m_Rows, m_Cols);
 			for (int i = 0; i < m_Rows; i++)
 				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] + b;
+					c[i][j] = m_Data[i][j] + b[i][j];
 			return c;
 		}
 
-		Matrix<T> operator+=(const Matrix<T> &b) const
-		{
-			if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
-			{
-				Matrix<T> c(m_Rows, m_Cols);
-				for (int i = 0; i < m_Rows; i++)
-					for (int j = 0; j < m_Cols; j++)
-						c[i][j] = m_Data[i][j] + b[i][j];
-				*this = c;
-			}
-
+		else
 			return *this;
-		}
+	}
+	Matrix<T> operator+(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] + b;
+		return c;
+	}
 
-		Matrix<T> operator+=(const T b) const
+	Matrix<T> operator+=(const Matrix<T> &b) const
+	{
+		if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
 		{
 			Matrix<T> c(m_Rows, m_Cols);
 			for (int i = 0; i < m_Rows; i++)
 				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] + b;
+					c[i][j] = m_Data[i][j] + b[i][j];
 			*this = c;
-			return *this;
 		}
 
-		Matrix<T> operator-(const Matrix<T> &b) const
-		{
-			if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
-			{
-				Matrix<T> c(m_Rows, m_Cols);
-				for (int i = 0; i < m_Rows; i++)
-					for (int j = 0; j < m_Cols; j++)
-						c[i][j] = m_Data[i][j] - b[i][j];
-				return c;
-			}
+		return *this;
+	}
 
-			else
-				return *this;
-		}
+	Matrix<T> operator+=(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] + b;
+		*this = c;
+		return *this;
+	}
 
-		Matrix<T> operator-(const T b) const
+	Matrix<T> operator-(const Matrix<T> &b) const
+	{
+		if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
 		{
 			Matrix<T> c(m_Rows, m_Cols);
 			for (int i = 0; i < m_Rows; i++)
 				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] - b;
+					c[i][j] = m_Data[i][j] - b[i][j];
 			return c;
 		}
 
-		Matrix<T> operator-=(const Matrix<T> &b) const
-		{
-			if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
-			{
-				Matrix<T> c(m_Rows, m_Cols);
-				for (int i = 0; i < m_Rows; i++)
-					for (int j = 0; j < m_Cols; j++)
-						c[i][j] = m_Data[i][j] - b[i][j];
-				*this = c;
-			}
-
+		else
 			return *this;
-		}
-		Matrix<T> operator-=(const T b) const
+	}
+
+	Matrix<T> operator-(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] - b;
+		return c;
+	}
+
+	Matrix<T> operator-=(const Matrix<T> &b) const
+	{
+		if ((m_Rows == b.m_Rows) && (m_Cols == b.m_Cols))
 		{
 			Matrix<T> c(m_Rows, m_Cols);
 			for (int i = 0; i < m_Rows; i++)
 				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] - b;
+					c[i][j] = m_Data[i][j] - b[i][j];
 			*this = c;
-			return *this;
 		}
 
-		Matrix<T> operator/(const T b) const
+		return *this;
+	}
+	Matrix<T> operator-=(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] - b;
+		*this = c;
+		return *this;
+	}
+
+	Matrix<T> operator/(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] / b;
+		return c;
+	}
+
+	Matrix<T> operator/=(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] / b;
+		*this = c;
+		return *this;
+	}
+
+	Matrix<T> operator*(const Matrix<T> &b) const
+	{
+		if (m_Cols == b.m_Rows)
 		{
-			Matrix<T> c(m_Rows, m_Cols);
+			Matrix<T> c(m_Rows, b.m_Cols);
 			for (int i = 0; i < m_Rows; i++)
 				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] / b;
+					for (int k = 0; k < b.m_Cols; k++)
+						c[i][k] += m_Data[i][j] * b[j][k];
 			return c;
 		}
 
-		Matrix<T> operator/=(const T b) const
-		{
-			Matrix<T> c(m_Rows, m_Cols);
-			for (int i = 0; i < m_Rows; i++)
-				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] / b;
-			*this = c;
+		else
 			return *this;
-		}
+	}
 
-		Matrix<T> operator*(const Matrix<T> &b) const
+	Matrix<T> operator*(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] * b;
+		return c;
+	}
+
+	Matrix<T> operator*=(const T b) const
+	{
+		Matrix<T> c(m_Rows, m_Cols);
+		for (int i = 0; i < m_Rows; i++)
+			for (int j = 0; j < m_Cols; j++)
+				c[i][j] = m_Data[i][j] * b;
+		*this = c;
+		return *this;
+	}
+
+	Iterator begin() { return Iterator(m_Data); }
+	Iterator end() { return Iterator(m_Data + m_Rows); }
+
+private:
+	Matrix<T> getMinor(const Matrix<T> &matrix, size_t row_to_remove, size_t col_to_remove) const
+	{
+		if (matrix.m_Rows != matrix.m_Cols)
+			throw std::invalid_argument("Matrix must be square to compute minor.");
+
+		size_t n = matrix.m_Rows;
+		Matrix<T> minor_matrix(n - 1, n - 1);
+
+		size_t minor_i = 0; // Row index for minor_matrix
+		for (size_t i = 0; i < n; ++i)
 		{
-			if (m_Cols == b.m_Rows)
+			if (i == row_to_remove)
+				continue;
+
+			size_t minor_j = 0; // Column index for minor_matrix
+			for (size_t j = 0; j < n; ++j)
 			{
-				Matrix<T> c(m_Rows, b.m_Cols);
-				for (int i = 0; i < m_Rows; i++)
-					for (int j = 0; j < m_Cols; j++)
-						for (int k = 0; k < b.m_Cols; k++)
-							c[i][k] += m_Data[i][j] * b[j][k];
-				return c;
-			}
-
-			else
-				return *this;
-		}
-
-		Matrix<T> operator*(const T b) const
-		{
-			Matrix<T> c(m_Rows, m_Cols);
-			for (int i = 0; i < m_Rows; i++)
-				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] * b;
-			return c;
-		}
-
-		Matrix<T> operator*=(const T b) const
-		{
-			Matrix<T> c(m_Rows, m_Cols);
-			for (int i = 0; i < m_Rows; i++)
-				for (int j = 0; j < m_Cols; j++)
-					c[i][j] = m_Data[i][j] * b;
-			*this = c;
-			return *this;
-		}
-
-		Iterator begin() { return Iterator(m_Data); }
-		Iterator end() { return Iterator(m_Data + m_Rows); }
-
-	private:
-		Matrix<T> getMinor(const Matrix<T> &matrix, size_t row_to_remove, size_t col_to_remove) const
-		{
-			if (matrix.m_Rows != matrix.m_Cols)
-				throw std::invalid_argument("Matrix must be square to compute minor.");
-
-			size_t n = matrix.m_Rows;
-			Matrix<T> minor_matrix(n - 1, n - 1);
-
-			size_t minor_i = 0; // Row index for minor_matrix
-			for (size_t i = 0; i < n; ++i)
-			{
-				if (i == row_to_remove)
+				if (j == col_to_remove)
 					continue;
 
-				size_t minor_j = 0; // Column index for minor_matrix
-				for (size_t j = 0; j < n; ++j)
-				{
-					if (j == col_to_remove)
-						continue;
-
-					minor_matrix[minor_i][minor_j] = matrix.m_Data[i][j];
-					++minor_j;
-				}
-				++minor_i;
+				minor_matrix[minor_i][minor_j] = matrix.m_Data[i][j];
+				++minor_j;
 			}
-
-			return minor_matrix;
+			++minor_i;
 		}
 
-		size_t m_Rows = 0;
-		size_t m_Cols = 0;
-		size_t m_Size = 0;
-		size_t m_Capacity = 0;
-		std::unique_ptr<MatrixRow<T>[]> m_Data;
-	};
+		return minor_matrix;
+	}
 
+	size_t m_Rows = 0;
+	size_t m_Cols = 0;
+	size_t m_Size = 0;
+	size_t m_Capacity = 0;
+	std::unique_ptr<MatrixRow<T>[]> m_Data;
+};
 }
 #endif
