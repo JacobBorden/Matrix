@@ -363,18 +363,18 @@ namespace Matrix
 		void assign(size_t size, T val)
 		{
 			resize(size);
-			std::fill_n(m_Data.get(), size, val)
+			std::fill_n(m_Data.get(), size, val);
 		}
 
 		void assign(T val) { std::fill_n(m_Data.get(), m_Size, val); }
 
 		size_t size() const { return m_Size; }
 
-		size_t capacity(){return m_Capacity}
+		size_t capacity(){return m_Capacity;}
 
 		T at(size_t i) const
 		{
-			if (i >= m__Size)
+			if (i >= m_Size)
 				throw std::out_of_range("Index out of range");
 			return m_Data[i];
 		}
@@ -415,7 +415,8 @@ namespace Matrix
 		using ColumonIterator = MatrixColumnIterator<Matrix<T>>;
 
 		Matrix<T>() = default;
-		explicit Matrix<T>(int row_count, int column_count) : m_Rows(row_count), m_Cols(column_count), m_Size(row_count * column_count), m_Capacity(sizeof(T) * row_count * column_count) m_Data(std::make_unique<MatrixRow<T>[]>(row_count))
+		explicit Matrix<T>(int row_count, int column_count)
+			: m_Rows(row_count), m_Cols(column_count), m_Size(row_count * column_count), m_Capacity(sizeof(T) * row_count * column_count), m_Data(std::make_unique<MatrixRow<T>[]>(row_count))
 		{
 			for (int i = 0; i < m_Rows; i++)
 				m_Data[i] = MatrixRow<T>(m_Cols);
@@ -424,7 +425,7 @@ namespace Matrix
 		size_t size() const { return m_Size; }
 		size_t rows() const { return m_Rows; }
 		size_t cols() const { return m_Cols; }
-		size_t capacity() const { return m_Capacity }
+		size_t capacity() const { return m_Capacity; }
 
 		void resize(size_t row_count, size_t col_count)
 		{
@@ -443,8 +444,9 @@ namespace Matrix
 
 		void assign(size_t row_count, size_t col_count, const T val)
 		{
-			resize(row_count, col_count) for (size_t i = 0; i < row_count; ++i)
-				std::fill_n(m_Data[i].get(), m_Data[i].size(), val);
+			resize(row_count, col_count);
+			for (size_t i = 0; i < row_count; ++i)
+				std::fill_n(m_Data[i].begin(), m_Data[i].size(), val);
 		}
 
 		void assign(const T val)
@@ -577,22 +579,23 @@ namespace Matrix
 				std::fill(m_Data[i].begin(), m_Data[i].end(), T(0));
 				m_Data[i][i] = T(1);
 			}
-			return *this
+			return *this;
 		}
 
 		Matrix<T> ZeroMatrix() const
 		{
-			for (auto &row : *this)
+			Matrix<T> result(*this);
+			for (auto &row : result)
 			{
-				std::fill(row.begin(), row.end(), T(0);)
+				std::fill(row.begin(), row.end(), T(0));
 			}
-			return *this;
+			return result;
 		}
 
 		Matrix<T> Transpose() const
 		{
 			Matrix<T> result(m_Cols, m_Rows);
-			for (size_t i = 0; i < m_Rows, ++i)
+			for (size_t i = 0; i < m_Rows; ++i)
 				for (size_t j = 0; j < m_Cols; ++j)
 					result[j][i] = m_Data[i][j];
 			return result;
@@ -608,13 +611,12 @@ namespace Matrix
 			else if (n == 2)
 				return m_Data[0][0] * m_Data[1][1] - m_Data[0][1] * m_Data[1][0];
 			T det = 0;
-			for (size_t = 0; i < n; ++i)
+			for (size_t i = 0; i < n; ++i)
 			{
 				Matrix<T> minor = getMinor(*this, 0, i);
 				int sign = ((i % 2) == 0) ? 1 : -1;
-				det += sign * matrix[0][i] * minor.Determinant();
+				det += sign * m_Data[0][i] * minor.Determinant();
 			}
-
 			return det;
 		}
 
