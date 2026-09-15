@@ -806,8 +806,10 @@ namespace Matrix
 		return *this;
 	}
 
-	Iterator begin() { return Iterator(m_Data); }
-	Iterator end() { return Iterator(m_Data + m_Rows); }
+	Iterator begin() { return Iterator(m_Data.get()); }
+	Iterator end() { return Iterator(m_Data.get() + m_Rows); }
+	Iterator begin() const { return Iterator(m_Data.get()); }
+	Iterator end() const { return Iterator(m_Data.get() + m_Rows); }
 
 private:
 	Matrix<T> getMinor(const Matrix<T> &matrix, size_t row_to_remove, size_t col_to_remove) const
