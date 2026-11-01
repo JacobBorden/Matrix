@@ -1,0 +1,58 @@
+[
+  {
+    "repository": "Neuro-Net-DLL",
+    "revision": "87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c",
+    "path": "src/math/matrix.h",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Neuro-Net-DLL/87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c/src/math/matrix.h",
+    "sha256": "6e0d3284aa569eb758dc351452201a4ea1312d3e75a47a918dfc8004ce3ebf96",
+    "bytes": 45613
+  },
+  {
+    "repository": "Neuro-Net-DLL",
+    "revision": "87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c",
+    "path": "tests/test_matrix_multiplication.cpp",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Neuro-Net-DLL/87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c/tests/test_matrix_multiplication.cpp",
+    "sha256": "db2a22b2da566ec55e904fd66ba64dfdc4dde5cf0a4097cab76660e6f314eac8",
+    "bytes": 2909
+  },
+  {
+    "repository": "Bitmap",
+    "revision": "4df8a9cecdce77c9e0eb98b0b0897a0c473c0710",
+    "path": "src/matrix/matrix.h",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Bitmap/4df8a9cecdce77c9e0eb98b0b0897a0c473c0710/src/matrix/matrix.h",
+    "sha256": "b48843eb204d2145117060165ea33fddb33d94dbd11c93744e577433e2eecd64",
+    "bytes": 29269
+  },
+  {
+    "repository": "Bitmap",
+    "revision": "4df8a9cecdce77c9e0eb98b0b0897a0c473c0710",
+    "path": "tests/test_matrix.cpp",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Bitmap/4df8a9cecdce77c9e0eb98b0b0897a0c473c0710/tests/test_matrix.cpp",
+    "sha256": "f9bde3067a611fc7f21999951fa77f685d42923dcda28ef09b9100bce7b5d366",
+    "bytes": 24443
+  },
+  {
+    "repository": "Bitmap",
+    "revision": "4df8a9cecdce77c9e0eb98b0b0897a0c473c0710",
+    "path": "tests/fuzz/fuzz_matrix.cpp",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Bitmap/4df8a9cecdce77c9e0eb98b0b0897a0c473c0710/tests/fuzz/fuzz_matrix.cpp",
+    "sha256": "b5f58ad121d77b47974edfcb7974592252f9a6b46fab386590392dfbbc2ed14a",
+    "bytes": 9769
+  },
+  {
+    "repository": "Neuro-Net-DLL",
+    "revision": "87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c",
+    "path": "src/utilities/logger.h",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Neuro-Net-DLL/87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c/src/utilities/logger.h",
+    "sha256": "e403fe89a1905efb62d734362f894c3d7f1b0166adc53ef6de46a96d184b0d35",
+    "bytes": 2068
+  },
+  {
+    "repository": "Neuro-Net-DLL",
+    "revision": "87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c",
+    "path": "src/utilities/timer.h",
+    "url": "https://raw.githubusercontent.com/JacobBorden/Neuro-Net-DLL/87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c/src/utilities/timer.h",
+    "sha256": "76109e29004dc30d336828125eddad0969788428fd7aedc4b45187d2163c2bf6",
+    "bytes": 1656
+  }
+]

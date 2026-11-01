@@ -1,0 +1,36 @@
+name: Legacy Matrix characterization
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master, codex/matrix-legacy-characterization]
+
+permissions:
+  contents: read
+
+jobs:
+  characterize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        slice:
+          - multiplication
+          - storage
+          - api
+          - determinant
+          - division
+          - inverse
+          - bounds
+          - matrix-at
+          - row-resize-failure
+          - copy-assignment-failure
+          - matrix-resize-failure
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run pinned legacy characterization and its controls
+        run: python3 "characterization/${{ matrix.slice }}-v1/run.py" --output "${RUNNER_TEMP}/matrix-${{ matrix.slice }}"
