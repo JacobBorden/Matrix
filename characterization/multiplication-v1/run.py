@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+from native_diagnostic import is_constructor_rejection
 
 ROOT = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
@@ -42,7 +43,8 @@ base = ['g++','-Wall','-Wextra','-Wno-unknown-pragmas','-ffp-contract=off']
 for owner,header in headers.items():
     define = '-DLEGACY_HEADER="'+str(ROOT/header)+'"'
     native = out/(owner+'-cxx20')
-    run(owner+'-native-cxx20',base+['-std=c++20','-pedantic-errors','-O0',define,str(ROOT/'multiplication.cpp'),'-o',str(native)])
+    native_flags = ['-fmax-errors=1'] if owner == 'neuro' else []
+    run(owner+'-native-cxx20',base+['-std=c++20','-pedantic-errors','-O0']+native_flags+[define,str(ROOT/'multiplication.cpp'),'-o',str(native)])
 # Successful baseline builds: pinned Neuro C++17; pinned Bitmap C++20.
 for owner,standard in [('neuro','c++17'),('bitmap','c++20')]:
     define = '-DLEGACY_HEADER="'+str(ROOT/headers[owner])+'"'
@@ -58,6 +60,6 @@ summary = {'sources':records,'results':results,'test_groups_per_execution':16,'e
 (out/'results.json').write_text(json.dumps(summary,indent=2)+'\n')
 expected_failure = [r for r in results if r['label']=='neuro-native-cxx20']
 bad = [r for r in results if r['label'] != 'neuro-native-cxx20' and (r['exit_code'] != 0 or ('passed' in r and (r['passed'] != 16 or r['failed'] != 0)))]
-if not expected_failure or expected_failure[0]['exit_code'] == 0 or 'template-id not allowed for constructor in C++20' not in Path(expected_failure[0]['log']).read_text():
+if not expected_failure or not is_constructor_rejection(expected_failure[0]['exit_code'], Path(expected_failure[0]['log']).read_text(), ROOT/headers['neuro']):
     sys.exit('Native compatibility outcome changed; review expectations')
 sys.exit(1 if bad else 0)
