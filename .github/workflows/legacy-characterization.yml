@@ -27,6 +27,7 @@ jobs:
           - matrix-at
           - row-resize-failure
           - copy-assignment-failure
+          - empty-shapes
           - matrix-resize-failure
     env:
       PYTHONDONTWRITEBYTECODE: '1'
