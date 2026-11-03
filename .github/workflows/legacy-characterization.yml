@@ -27,6 +27,7 @@ jobs:
           - matrix-at
           - row-resize-failure
           - copy-assignment-failure
+          - elementwise
           - transpose
           - empty-shapes
           - matrix-resize-failure
