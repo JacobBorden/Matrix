@@ -28,6 +28,7 @@ jobs:
           - row-resize-failure
           - copy-assignment-failure
           - elementwise
+          - merge
           - scalar-multiply
           - transpose
           - empty-shapes
