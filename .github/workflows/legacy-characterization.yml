@@ -28,6 +28,7 @@ jobs:
           - row-resize-failure
           - copy-assignment-failure
           - elementwise
+          - iterator
           - merge
           - scalar-multiply
           - transpose
