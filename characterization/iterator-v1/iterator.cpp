@@ -23,6 +23,26 @@ template<class T> void cases(){
   values=values && c==3;
  }
  check(values && r==2 && n==6,"asymmetric row-major golden traversal");
+ // Arithmetic stays within one allocated row, including its one-past endpoint.
+ auto first=m[0].begin(),last=m[0].end();
+ check(last-first==3 && first-last==-3,"signed row distances");
+ auto middle=first+1;
+ check(*middle==2 && *first==-3,"addition preserves source");
+ check(*(last-1)==7,"subtraction from endpoint");
+ check(*(middle+(-1))==-3 && *(middle-(-1))==7,"negative offsets");
+ check(&(middle+=1)==&middle && *middle==7,"plus assign identity");
+ check(&(middle-=1)==&middle && *middle==2,"minus assign identity");
+ check(&(middle+=(-1))==&middle && middle==first,"negative plus assign");
+ check(&(middle-=(-1))==&middle && *middle==2,"negative minus assign");
+ check(first< middle && middle<last && last>middle && middle>first,"strict ordering");
+ check(first<=first && last>=last && first<=last && last>=first,"inclusive ordering");
+ check(!(first<first) && !(last>last) && !(last<=first) && !(first>=last),"ordering negatives");
+ const auto fixed=middle;
+ check(fixed[-1]==-3 && fixed[0]==2 && fixed[1]==7,"const iterator signed indexing");
+ check(&fixed[1]==&m[0][2],"index aliases row storage");
+ fixed[1]=T(19);check(m[0][2]==19,"indexed mutation observed");
+ m[0][2]=T(7);
+ check(std::distance(first,last)==3,"standard distance within row");
  auto it=m[0].begin();auto ri=it++;
  check(*ri==-3 && *it==2,"element postfix increment");
  auto rd=it--;check(*rd==2 && *it==-3,"element postfix decrement");
