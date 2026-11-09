@@ -17,3 +17,13 @@ Canonical origin/master fetched in the canonical checkout: 1500576c382036085bcd5
 Command from the same persistent worktree recorded above: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261108-iterator-arithmetic"`. GCC (SUSE Linux) 15.2.1 20251006, Linux/libstdc++; Neuro C++17 and Bitmap C++20. Debug, Release/NDEBUG and ASan+UBSan in isolated executables; seven immutable source hashes checked. Exit 0: 90 Neuro and 96 Bitmap checks per execution (558 total), zero failed checks or sanitizer diagnostics; exact commands, logs and results remain in work/20261108-iterator-arithmetic/results.json.
 
 Scope: signed within-row arithmetic/distance, ordering, indexed aliases, compound identities and std::distance for int/float/double. No kernels, pinned inputs or consumers changed. Column traversal and full standard iterator conformance remain unqualified; Pixel, serialization, supported-platform and exact package/consumer acceptance remain open. Existing const alias behavior is observed, not approved. Primary checkout changes and untracked work preserved. Existing draft PR1 reused; remote CI status is recorded separately after publication.
+
+# November 9, 2026 matrix-row arithmetic increment
+
+Canonical fetch origin/master: 1500576c382036085bcd5b267c815e9b9117d1ba, already ancestor of persistent codex/matrix-legacy-characterization. Parent task head: c95e5de214f24471cbb8b6ecdbc148e54ea70b01. Candidate is the commit containing this note; documentation does not change tested inputs.
+
+Command in the persistent worktree above: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261109-matrix-row-arithmetic"`. GCC SUSE 15.2.1 20251006, Linux/libstdc++; Neuro C++17, Bitmap C++20. Seven source hashes verified; isolated Debug, Release/NDEBUG and ASan+UBSan executions. Exact commands/logs/toolchain are retained in that output directory.
+
+Scope: Neuro arithmetic over its allocated row-object array, signed distances, negative offsets, compound identities, ordering, std::distance and mutation aliases for int/float/double. Bitmap traversal coverage retained; its matrix iterator lacks arithmetic/traits. Neuro matrix iterator indexing is not qualified (const indexing calls non-const dereference in the pinned source). No empty-pointer subtraction or cross-allocation scalar arithmetic. Full iterator conformance, Pixel, serialization, platform and exact package/consumer acceptance remain open. Primary unrelated edits and work/ preserved. Prior-head CI: all 34 checks succeeded; candidate CI is separate. Existing draft PR1 reused, no merge/release.
+
+Result: exit 0, six executions: Neuro 129 checks each and Bitmap 96 each, 675 total passes, zero failures or sanitizer diagnostics.

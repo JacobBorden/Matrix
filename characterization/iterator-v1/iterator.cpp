@@ -17,6 +17,25 @@ template<class T> void cases(){
  check(&(++b)==&b && (*b)[2]==4,"row prefix increment identity");
  check(&(--b)==&b && (*b)[2]==7,"row prefix decrement identity");
  check(b.operator->()==&m[0],"row arrow aliases storage");
+#ifdef NEURO
+ // Row objects are allocated in one array; scalar rows remain separate allocations.
+ auto rb=m.begin(),re=m.end(),second=rb+1;
+ check(re-rb==2 && rb-re==-2,"matrix signed row distances");
+ check((*second)[0]==11 && rb==m.begin(),"row addition preserves source");
+ auto tail=re-1;check(tail==second && (*tail)[2]==4,"row subtraction from endpoint");
+ check(second+(-1)==rb && rb-(-1)==second,"row negative offsets");
+ check(&(second+=(-1))==&second && second==rb,"row negative plus assign identity");
+ check(&(second-=(-1))==&second && (*second)[1]==-9,"row negative minus assign identity");
+ check(&(second+=1)==&second && second==re,"row plus assign endpoint");
+ check(&(second-=1)==&second && second==tail,"row minus assign endpoint");
+ check(rb<second && second<re && re>second && second>rb,"row strict ordering");
+ check(rb<=rb && re>=re && rb<=re && re>=rb,"row inclusive ordering");
+ check(!(rb<rb) && !(re>re) && !(re<=rb) && !(rb>=re),"row ordering negatives");
+ check(std::distance(rb,re)==2,"standard distance over row objects");
+ (*tail)[0]=T(71);check(m[1][0]==71 && &*tail==&m[1],"row arithmetic storage alias");
+ m[1][0]=T(11);
+#endif
+
  size_t r=0,n=0;bool values=true;
  for(auto row=m.begin();row!=m.end();++row,++r){
   size_t c=0;for(auto it=row->begin();it!=row->end();++it,++c,++n)values=values && *it==golden[r*3+c];
