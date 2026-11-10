@@ -82,4 +82,32 @@ template<class T> void cases(){
 #endif
  M empty;check(empty.begin()==empty.end(),"default empty range equality");
 }
-int main(){cases<int>();cases<float>();cases<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void narrow_shapes(){
+ using M=Matrix::Matrix<T>;
+ for(auto shape : {std::pair<size_t,size_t>{1,1},{1,3},{3,1}}){
+  const auto rows=shape.first,cols=shape.second;
+  M m(rows,cols);
+  for(size_t r=0;r<rows;++r)for(size_t c=0;c<cols;++c)m[r][c]=T(10*r+2*c);
+  size_t r=0,n=0;bool ok=true;
+  for(auto row=m.begin();row!=m.end();++row,++r){
+   size_t c=0;
+   for(auto it=row->begin();it!=row->end();++it,++c,++n)
+    ok=ok && *it==T(10*r+2*c);
+   ok=ok && c==cols;
+  }
+  check(ok && r==rows && n==rows*cols,"narrow shape forward golden traversal");
+  auto row=m.end();r=rows;n=0;ok=true;
+  while(row!=m.begin()){
+   --row;--r;auto it=row->end();size_t c=cols;
+   while(it!=row->begin()){--it;--c;++n;ok=ok && *it==T(10*r+2*c);}
+   ok=ok && c==0;
+  }
+  check(ok && r==0 && n==rows*cols,"narrow shape reverse golden traversal");
+  auto tail=m.end();--tail;auto cell=tail->end();--cell;
+  check(&*tail==&m[rows-1] && &*cell==&m[rows-1][cols-1],"narrow shape endpoint aliases");
+  *cell=T(-17);check(m[rows-1][cols-1]==T(-17),"narrow shape endpoint mutation");
+  ++cell;++tail;
+  check(cell==m[rows-1].end() && tail==m.end(),"narrow shape endpoint restoration");
+ }
+}
+int main(){cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}

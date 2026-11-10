@@ -27,3 +27,15 @@ Command in the persistent worktree above: `python3 characterization/iterator-v1/
 Scope: Neuro arithmetic over its allocated row-object array, signed distances, negative offsets, compound identities, ordering, std::distance and mutation aliases for int/float/double. Bitmap traversal coverage retained; its matrix iterator lacks arithmetic/traits. Neuro matrix iterator indexing is not qualified (const indexing calls non-const dereference in the pinned source). No empty-pointer subtraction or cross-allocation scalar arithmetic. Full iterator conformance, Pixel, serialization, platform and exact package/consumer acceptance remain open. Primary unrelated edits and work/ preserved. Prior-head CI: all 34 checks succeeded; candidate CI is separate. Existing draft PR1 reused, no merge/release.
 
 Result: exit 0, six executions: Neuro 129 checks each and Bitmap 96 each, 675 total passes, zero failures or sanitizer diagnostics.
+
+# November 10, 2026 narrow-shape iterator increment
+
+Canonical origin/master fetched in the canonical checkout: 1500576c382036085bcd5b267c815e9b9117d1ba, already ancestor. Persistent branch codex/matrix-legacy-characterization; parent c3c4a56087edcf954c0571aabfc71d2a5f56f9cd. Candidate is the commit containing this note; tested source hashes below bind the unchanged executable inputs.
+
+Command in the persistent worktree recorded above: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261110-narrow-iterators"`. Exit 0: six executions, Neuro174/Bitmap141 each, 945 checks passed, zero failures or sanitizer diagnostics. GCC SUSE15.2.1 20251006 Linux/libstdc++; Neuro C++17, Bitmap C++20; Debug, Release/NDEBUG and ASan+UBSan. Seven immutable legacy source hashes verified. Exact commands and logs: work/20261110-narrow-iterators/results.json.
+
+Acceptance for this increment: 1x1, 1x3 and 3x1 golden forward/reverse traversal, endpoint storage aliases, mutation and restoration for int/float/double. No empty decrement or cross-allocation scalar arithmetic. Full iterator conformance/invalidation, Pixel, serialization, Windows/MSVC and exact package/consumer acceptance remain open. Existing workflow includes this slice; prior head has 34 successful checks, candidate CI is separate. Primary checkout changes and unrelated work/ preserved. Draft PR1 reused; no merge/release.
+
+Tested inputs (documentation-only additions followed execution):
+- iterator.cpp: `94384c8ec9cb9366cb34d9bd10152f573372125146e2079b0fd4e36cf90c9382`
+- run.py: `840b675ae3ca138dc5b4f47abab51b7ccd244c705733e3b0715eb775fa7c412c`
