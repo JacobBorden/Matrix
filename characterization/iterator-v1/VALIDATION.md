@@ -39,3 +39,15 @@ Acceptance for this increment: 1x1, 1x3 and 3x1 golden forward/reverse traversal
 Tested inputs (documentation-only additions followed execution):
 - iterator.cpp: `94384c8ec9cb9366cb34d9bd10152f573372125146e2079b0fd4e36cf90c9382`
 - run.py: `840b675ae3ca138dc5b4f47abab51b7ccd244c705733e3b0715eb775fa7c412c`
+
+# November 11, 2026 standard row algorithm increment
+
+Canonical origin/master fetched in the designated canonical checkout: 1500576c382036085bcd5b267c815e9b9117d1ba, already ancestor. Persistent branch codex/matrix-legacy-characterization; parent 511965abaf3a3d991e6a6670208bae0f0f16dfc5. Candidate is the commit containing this note.
+
+Command from /mnt/c/Users/jacob/Documents/Codex/2026-10-31/task/four-publication-repair/publication/worktrees/matrix: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261111-row-algorithms"`. Exit 0: six separate Debug, Release/NDEBUG and ASan+UBSan executions, Neuro195/Bitmap162 each, 1071 total passes, zero failures or sanitizer diagnostics. GCC SUSE15.2.1 20251006 Linux/libstdc++; Neuro C++17 and Bitmap C++20. All seven pinned legacy hashes verified; exact commands and raw logs saved in that output's results.json.
+
+Acceptance: std::reverse and std::copy on one allocated row, golden values, returned copy endpoints, restoration after two reversals, storage aliases and untouched adjacent row, for int/float/double. All pass. Source review confirms no scalar arithmetic between row allocations. Full standard iterator conformance, Pixel, serialization, supported platforms and exact package/consumer qualification remain open. Primary unrelated edits and work preserved. Prior-head 34 CI checks succeeded; new candidate CI is separate. Existing draft PR1 retained; no merge/release or consumer changes.
+
+Tested input SHA-256 (only documentation added after execution):
+- iterator.cpp: `5b8144438c193b12bdb8618958591fced6d2266c74e9da695f0ecf4d2490bbe0`
+- run.py: `11b67d047a524b0c67cbff1be93bca8554c4ec582843e5df43123325ea651d8d`

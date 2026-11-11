@@ -1,5 +1,6 @@
 // Compile each pinned legacy definition separately.
 #include LEGACY_HEADER
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -110,4 +111,25 @@ template<class T> void narrow_shapes(){
   check(cell==m[rows-1].end() && tail==m.end(),"narrow shape endpoint restoration");
  }
 }
-int main(){cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void row_algorithms(){
+ using M=Matrix::Matrix<T>;
+ M m(2,3);
+ const T input[]={T(-7),T(2),T(11)};
+ for(size_t c=0;c<3;++c){m[0][c]=input[c];m[1][c]=T(40+c);}
+ auto first=m[0].begin(),last=m[0].end();
+ T* address=&m[0][0];
+ std::reverse(first,last);
+ check(m[0][0]==T(11) && m[0][1]==T(2) && m[0][2]==T(-7),"standard reverse golden values");
+ check(&*first==address && &m[0][0]==address,"standard reverse preserves storage aliases");
+ check(m[1][0]==T(40) && m[1][1]==T(41) && m[1][2]==T(42),"standard reverse preserves other row");
+ std::reverse(first,last);
+ check(m[0][0]==input[0] && m[0][1]==input[1] && m[0][2]==input[2],"standard reverse twice restores values");
+ T copied[3]={};
+ auto output=std::copy(first,last,copied);
+ check(output==copied+3 && copied[0]==input[0] && copied[1]==input[1] && copied[2]==input[2],"standard copy to array golden values and endpoint");
+ const T replacement[]={T(5),T(-13),T(8)};
+ auto end=std::copy(replacement,replacement+3,first);
+ check(end==last && m[0][0]==T(5) && m[0][1]==T(-13) && m[0][2]==T(8),"standard copy to row golden values and endpoint");
+ check(&*first==address && m[1][0]==T(40) && m[1][2]==T(42),"standard copy preserves storage and other row");
+}
+int main(){row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
