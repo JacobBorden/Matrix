@@ -51,3 +51,17 @@ Acceptance: std::reverse and std::copy on one allocated row, golden values, retu
 Tested input SHA-256 (only documentation added after execution):
 - iterator.cpp: `5b8144438c193b12bdb8618958591fced6d2266c74e9da695f0ecf4d2490bbe0`
 - run.py: `11b67d047a524b0c67cbff1be93bca8554c4ec582843e5df43123325ea651d8d`
+
+# November 12, 2026 within-row sort increment
+
+Canonical fetch origin/master: 1500576c382036085bcd5b267c815e9b9117d1ba, already ancestor. Persistent branch codex/matrix-legacy-characterization; parent 8f048b0bab17b0a95ab9b0b810a55165c16e9f95. Candidate is the commit containing this note.
+
+Working directory: /mnt/c/Users/jacob/Documents/Codex/2026-10-31/task/four-publication-repair/publication/worktrees/matrix
+
+Command: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261112-row-sort"`. Exit 0: six isolated executions, Neuro207/Bitmap174 each, 1143 passes, zero failures or sanitizer diagnostics. GCC SUSE15.2.1 20251006 Linux/libstdc++; Neuro C++17 and Bitmap C++20; Debug, Release/NDEBUG, ASan+UBSan. Seven pinned input hashes verified. Exact commands/logs in that output's results.json.
+
+Acceptance: std::sort within a five-element allocated row, ascending/descending independent golden values including duplicate, custom comparator, unchanged storage/endpoints and adjacent row for int/float/double. All passed. No cross-row scalar arithmetic. Full iterator conformance, Pixel, serialization, supported platforms and exact package/consumer acceptance remain open. Primary unrelated changes and work preserved. Existing draft PR1 reused; prior-head34 CI checks successful, candidate CI recorded separately. No merge/release or consumer edits.
+
+Tested input SHA-256 (documentation-only addition after execution):
+- iterator.cpp: `f1651b3f19a2289dc22024f8a897dde6c04fc1e2714be2d8f5726629e5ef7599`
+- run.py: `2cfbc8bd72382e8d182afbd7f1fbe6eed04abbdee4c89d03c48d5599de3b95fd`

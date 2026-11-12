@@ -132,4 +132,22 @@ template<class T> void row_algorithms(){
  check(end==last && m[0][0]==T(5) && m[0][1]==T(-13) && m[0][2]==T(8),"standard copy to row golden values and endpoint");
  check(&*first==address && m[1][0]==T(40) && m[1][2]==T(42),"standard copy preserves storage and other row");
 }
-int main(){row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void row_sort(){
+ using M=Matrix::Matrix<T>;
+ M m(2,5);
+ const T input[]={T(8),T(-3),T(8),T(0),T(2)};
+ for(size_t c=0;c<5;++c){m[0][c]=input[c];m[1][c]=T(40+c);}
+ auto first=m[0].begin(),last=m[0].end();T* address=&m[0][0];
+ std::sort(first,last);
+ const T ascending[]={T(-3),T(0),T(2),T(8),T(8)};
+ bool ok=true;for(size_t c=0;c<5;++c)ok=ok && m[0][c]==ascending[c];
+ check(ok,"standard sort ascending golden values including duplicate");
+ check(&*first==address && last==m[0].end(),"standard sort preserves storage and endpoints");
+ std::sort(first,last,[](const T& a,const T& b){return a>b;});
+ const T descending[]={T(8),T(8),T(2),T(0),T(-3)};
+ ok=true;for(size_t c=0;c<5;++c)ok=ok && m[0][c]==descending[c];
+ check(ok,"standard sort comparator descending golden values");
+ ok=true;for(size_t c=0;c<5;++c)ok=ok && m[1][c]==T(40+c);
+ check(ok && &*first==address,"standard sort preserves adjacent row and alias");
+}
+int main(){row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
