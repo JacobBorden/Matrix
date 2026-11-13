@@ -4,7 +4,7 @@ Separate executables use the seven hash-verified inputs in ../multiplication-v1/
 
 Acceptance: asymmetric 2x3 row-major golden traversal for int/float/double; row and element prefix/postfix increment/decrement, prefix return identity, storage aliases and default empty range equality, with checks active under NDEBUG. Neuro lacks const Matrix begin/end; Bitmap exposes mutable rows through const Matrix iterators. Both expose mutable elements through const row iterators. This records legacy behavior, not an approved const contract.
 
-Run `python3 characterization/iterator-v1/run.py --output /absolute/fresh/output` from this worktree. Neuro uses C++17; Bitmap C++20. The runner verifies pins and runs Debug, Release and ASan+UBSan separately. It saves exact commands, logs and counts. Expected counts: Neuro 207, Bitmap 174 per execution.
+Run `python3 characterization/iterator-v1/run.py --output /absolute/fresh/output` from this worktree. Neuro uses C++17; Bitmap C++20. The runner verifies pins and runs Debug, Release and ASan+UBSan separately. It saves exact commands, logs and counts. Expected counts: Neuro 231, Bitmap 198 per execution.
 
 No column iterator traversal is attempted: independently allocated rows do not establish contiguous scalar storage. Full standard iterator conformance, invalidation, degenerate shapes beyond default empty, Pixel, Windows/MSVC, extraction and package/consumer acceptance remain open. No legacy input, kernel, package header or consumer is modified.
 
@@ -17,3 +17,5 @@ November 10 increment: 1x1, 1x3 and 3x1 forward/reverse golden traversal, row/el
 November 11 increment: std::reverse and std::copy within one allocated three-element row for int/float/double. Exact golden values, returned copy endpoints, reversal restoration, storage aliases and an untouched adjacent row are checked. This qualifies these selected algorithm uses only, not full standard iterator conformance.
 
 November 12 increment: std::sort within one allocated five-element row, exact ascending/descending golden values with duplicates, custom comparator, storage/endpoint aliases and unchanged adjacent row for int/float/double. Selected algorithm use only; full iterator conformance remains open.
+
+November 13 increment: saved row/element iterators and endpoints follow matrix storage through move construction and move assignment into a nonempty destination, for int/float/double. Golden values, assignment return identity, aliases, mutation through saved iterators and emptied sources are checked. No iterator into the replaced destination is used; resize invalidation and general lifetime guarantees remain open.

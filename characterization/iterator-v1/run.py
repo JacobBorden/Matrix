@@ -29,7 +29,7 @@ for owner,std,header in [('neuro','c++17','src/math/matrix.h'),('bitmap','c++20'
         if owner=='neuro':cmd+=['-DNEURO=1']
         cmd+=['-DLEGACY_HEADER="'+str(legacy/'legacy'/owner/header)+'"',str(root/'iterator.cpp'),'-o',str(exe)]
         if run(owner+'-'+mode+'-build',cmd)==0:run(owner+'-'+mode+'-tests',[str(exe)],True)
-expected={'neuro':207,'bitmap':174}
+expected={'neuro':231,'bitmap':198}
 summary=dict(sources=sources,results=results,expected_groups_per_execution=expected,expected_executions=6)
 (out/'results.json').write_text(json.dumps(summary,indent=2)+'\n')
 bad=any(r['exit_code']!=0 or ('passed' in r and (r['passed']!=expected[r['label'].split('-')[0]] or r['failed']!=0)) for r in results)

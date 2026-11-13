@@ -65,3 +65,20 @@ Acceptance: std::sort within a five-element allocated row, ascending/descending 
 Tested input SHA-256 (documentation-only addition after execution):
 - iterator.cpp: `f1651b3f19a2289dc22024f8a897dde6c04fc1e2714be2d8f5726629e5ef7599`
 - run.py: `2cfbc8bd72382e8d182afbd7f1fbe6eed04abbdee4c89d03c48d5599de3b95fd`
+
+# November 13, 2026 move iterator lifetime increment
+
+Canonical fetched origin/master: 1500576c382036085bcd5b267c815e9b9117d1ba (already ancestor). Persistent branch codex/matrix-legacy-characterization, parent f158a64a79c80f16632f695623ee9bbe06421fbb. Candidate is the commit containing this note.
+
+Acceptance scope: int/float/double saved matrix-row and row-element iterators, including endpoints, retain transferred storage after move construction and move assignment into a nonempty destination. Golden values, storage aliases, mutation through saved iterators, assignment return identity and emptied sources are checked. Replaced-destination iterators are never used. Resize invalidation, full conformance, Pixel, serialization, supported platforms and package/consumer acceptance remain open.
+
+Explicit working directory: /mnt/c/Users/jacob/Documents/Codex/2026-10-31/task/four-publication-repair/publication/worktrees/matrix.
+Command: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261113-move-iterators"` exited 1 after the Bitmap ASan+UBSan compiler exceeded its 90-second timeout. Before that failure, Neuro Debug/Release/ASan+UBSan each passed231/231; Bitmap Debug/Release each passed198/198 (1089 total, no test failures). Those unchanged executions are reused. The runner aborts before writing results.json on timeout; individual completed command logs are retained. No timeout is reported as a pass.
+
+Toolchain: GCC (SUSE Linux)15.2.1 20251006, Linux/libstdc++; Neuro C++17 and Bitmap C++20. Seven legacy source hashes verified by runner, pins unchanged. Focused retry uses the identical Bitmap sanitizer compile flags with a 180-second bound and a fresh executable bitmap-sanitized-retry; exact commands/exits in work/20261113-move-iterators/retry-results.json, raw logs adjacent.
+
+SHA256 iterator.cpp: a81f5d8c19011d91af61efa29b2b0c1c5fbd7e60c5e777e5859d2ea4db640e4a
+
+SHA256 run.py: 180dcabd6756e2996c4ea72a2bc0a30d0d4d7a2607ee05cb06ee3eef994be629
+
+Focused retry completed: build exit0, test exit0,198/198 checks and no sanitizer diagnostics. Combined six executions:1287 passes,zero test failures. Initial runner exit1/compiler timeout remains preserved above. Cached diff whitespace check passed. CI for this candidate must be inspected separately; previous head34 successful checks do not validate this revision.

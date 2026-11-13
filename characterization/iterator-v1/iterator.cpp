@@ -150,4 +150,23 @@ template<class T> void row_sort(){
  ok=true;for(size_t c=0;c<5;++c)ok=ok && m[1][c]==T(40+c);
  check(ok && &*first==address,"standard sort preserves adjacent row and alias");
 }
-int main(){row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void move_aliases(){
+ using M=Matrix::Matrix<T>;
+ M source(2,3);
+ for(size_t r=0;r<2;++r)for(size_t c=0;c<3;++c)source[r][c]=T(10*r+2*c-0.0);
+ auto row=source.begin(),row_end=source.end();
+ auto cell=source[0].begin(),cell_end=source[0].end();
+ M moved(std::move(source));
+ check(row==moved.begin() && row_end==moved.end(),"move construction preserves row iterators");
+ check(cell==moved[0].begin() && cell_end==moved[0].end(),"move construction preserves element iterators");
+ check(&*row==&moved[0] && &*cell==&moved[0][0],"move construction storage aliases");
+ bool ok=true;for(size_t r=0;r<2;++r)for(size_t c=0;c<3;++c)ok=ok && moved[r][c]==T(10*r+2*c);
+ check(ok && source.size()==0,"move construction values and emptied source");
+ M target(1,1);target[0][0]=T(99);
+ check(&(target=std::move(moved))==&target,"move assignment return identity");
+ check(row==target.begin() && row_end==target.end() && cell==target[0].begin() && cell_end==target[0].end(),"move assignment preserves source iterators");
+ *cell=T(-17);(*row)[2]=T(23);
+ check(target[0][0]==T(-17) && target[0][2]==T(23) && target[1][2]==T(14),"saved iterators mutate new owner only");
+ check(moved.size()==0 && &*row==&target[0] && &*cell==&target[0][0],"move assignment storage aliases and emptied source");
+}
+int main(){move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
