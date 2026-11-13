@@ -1,0 +1,69 @@
+name: Legacy Matrix characterization
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master, codex/matrix-legacy-characterization]
+
+permissions:
+  contents: read
+
+jobs:
+  characterize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        slice:
+          - multiplication
+          - storage
+          - api
+          - determinant
+          - division
+          - inverse
+          - bounds
+          - matrix-at
+          - row-resize-failure
+          - copy-assignment-failure
+          - elementwise
+          - iterator
+          - merge
+          - scalar-multiply
+          - transpose
+          - empty-shapes
+          - matrix-resize-failure
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check compiler-diagnostic qualification controls
+        if: matrix.slice == 'multiplication'
+        run: python3 -B characterization/multiplication-v1/test_native_diagnostic.py
+      - name: Run pinned legacy characterization and its controls
+        run: python3 "characterization/${{ matrix.slice }}-v1/run.py" --output "${RUNNER_TEMP}/matrix-${{ matrix.slice }}"
+      - name: Show saved compiler and command evidence on failure
+        if: failure()
+        env:
+          SLICE_OUTPUT: ${{ runner.temp }}/matrix-${{ matrix.slice }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          output = Path(os.environ['SLICE_OUTPUT'])
+          summary = output / 'results.json'
+          paths = {output / 'neuro-native-cxx20.log', output / 'bitmap-native-cxx20.log'}
+          if summary.exists():
+              print(summary.read_text())
+              data = json.loads(summary.read_text())
+              paths.update(Path(record['log']) for record in data.get('results', []) + data.get('probes', [])
+                           if record['exit_code'] != 0)
+          else:
+              paths.update(output.glob('*.log'))
+          for path in sorted(paths):
+              if path.is_file():
+                  print(f'=== {path.name} ===')
+                  print(path.read_text(errors='replace')[-16000:])
+          PY
