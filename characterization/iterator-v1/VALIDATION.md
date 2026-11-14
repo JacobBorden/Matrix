@@ -82,3 +82,18 @@ SHA256 iterator.cpp: a81f5d8c19011d91af61efa29b2b0c1c5fbd7e60c5e777e5859d2ea4db6
 SHA256 run.py: 180dcabd6756e2996c4ea72a2bc0a30d0d4d7a2607ee05cb06ee3eef994be629
 
 Focused retry completed: build exit0, test exit0,198/198 checks and no sanitizer diagnostics. Combined six executions:1287 passes,zero test failures. Initial runner exit1/compiler timeout remains preserved above. Cached diff whitespace check passed. CI for this candidate must be inspected separately; previous head34 successful checks do not validate this revision.
+
+# November 14, 2026 copy iterator lifetime increment
+
+Canonical fetched origin/master: `1500576c382036085bcd5b267c815e9b9117d1ba` (already ancestor). Persistent branch `codex/matrix-legacy-characterization`; parent `2acfa514f33385e2ff4c01929cebed04b82f8550`. Candidate is the commit containing this note.
+
+Acceptance: copy construction and assignment into a nonempty destination preserve saved source row/element iterators and endpoints for int/float/double. Independent copied row/element storage, golden values, assignment return identity and mutation isolation are checked. No replaced-destination iterator is used.
+
+Explicit working directory: `/mnt/c/Users/jacob/Documents/Codex/2026-10-31/task/four-publication-repair/publication/worktrees/matrix`.
+Command: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261114-copy-iterators"`, exit 0. Six isolated executions: Neuro258/Bitmap225 each, 1449 passes, zero failures or sanitizer diagnostics. GCC (SUSE Linux)15.2.1 20251006, Linux/libstdc++; Neuro C++17, Bitmap C++20; Debug, Release/NDEBUG, ASan+UBSan. Seven pinned legacy hashes verified unchanged. Exact commands, exits and raw logs: `work/20261114-copy-iterators/results.json` and adjacent files.
+
+Full iterator conformance/resize invalidation, actual Pixel, serialization, Windows/MSVC, extraction and exact-package/consumer acceptance remain open. No production or consumer changes. Prior head34 CI checks successful; candidate CI must be checked separately. Primary unrelated edits and untracked work preserved. Existing draft PR1 reused; no merge or release. Labels codex/codex-automation unavailable in repository.
+
+Tested SHA256 inputs:
+- iterator.cpp: `530155123f199ffb74ae6045b9f0f3ad3c82612e618082ee8d61ac153417b7a4`
+- run.py: `cbd9823e4a9fe8b74ead7cf0375c2ee87981a52a34ab67d781d7f3b681d9a9ee`
