@@ -117,3 +117,16 @@ Tested SHA256 inputs:
 - run.py: `6d2d25b17e8642af844dd085708f98d843b3ab099d218f85e7f351056b554dcf`
 
 Corrected full runner exit0: six executions, Neuro279/Bitmap246 each, 1575 passes, zero failures or sanitizer diagnostics. Scoped diff whitespace check passed.
+
+## November 17, 2026 self-move iterator lifetime
+
+Canonical `origin/master` is `1500576c382036085bcd5b267c815e9b9117d1ba`, an ancestor of the persistent branch `codex/matrix-legacy-characterization`. The parent for this increment is `36daacef4bcdf1e68751307da5adf3ecbc4da8cc`. The candidate is the commit containing this note.
+
+Both pinned implementations preserve matrix shape, size, golden values, storage addresses and row and element iterators when a nonempty matrix is move-assigned from an alias of itself. The fixture verifies assignment return identity, decrement from saved nonempty endpoints and mutation through saved iterators for int, float and double. Resize invalidation, full iterator conformance, actual Pixel coverage, serialization, Windows/MSVC and package qualification remain open.
+
+From the persistent worktree, `python3 -u characterization/iterator-v1/run.py --output "$PWD/work/20261117-self-move"` exited 0. The seven pinned source hashes matched. Six isolated Debug, Release with NDEBUG and ASan+UBSan executions passed 1,719 checks, including 144 new self-move checks, with zero failures or sanitizer diagnostics. Each Neuro C++17 execution passed 303 checks, and each Bitmap C++20 execution passed 270. Compiler was GCC (SUSE Linux) 15.2.1 20251006 with libstdc++. Exact commands and logs are in `work/20261117-self-move/results.json` and adjacent files.
+
+Tested SHA-256 hashes:
+
+- `iterator.cpp` `f57434b7a6e14d8279d54e8bd0e918ab63d9ed66a412874d3524d28a48564642`
+- `run.py` `b9b6452176d263311da89afffe65d768308ff326d7c29b21f4ef508bc6080662`

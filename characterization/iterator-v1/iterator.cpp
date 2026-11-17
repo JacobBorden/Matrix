@@ -1,6 +1,7 @@
 // Compile each pinned legacy definition separately.
 #include LEGACY_HEADER
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -209,4 +210,56 @@ template<class T> void self_copy_aliases(){
  auto last_row=row_end;--last_row;auto last_cell=cell_end;--last_cell;
  check(&*last_row==&m[1] && &*last_cell==&m[0][2],"saved self copy endpoints decrement to valid storage");
 }
-int main(){self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void self_move_aliases() {
+ using M = Matrix::Matrix<T>;
+ M matrix(2, 3);
+ const int golden[2][3] = {{-3, 2, 7}, {11, -9, 4}};
+ for (size_t row = 0; row < 2; ++row) {
+  for (size_t col = 0; col < 3; ++col) {
+   matrix[row][col] = T(golden[row][col]);
+  }
+ }
+
+ const auto row_begin = matrix.begin();
+ const auto row_end = matrix.end();
+ const auto cell_begin = matrix[0].begin();
+ const auto cell_end = matrix[0].end();
+ const auto row_address = reinterpret_cast<std::uintptr_t>(&matrix[0]);
+ const auto cell_address = reinterpret_cast<std::uintptr_t>(&matrix[0][0]);
+
+ M& alias = matrix;
+ check(&(matrix = std::move(alias)) == &matrix, "self move assignment return identity");
+ const bool shape_preserved = matrix.rows() == 2 && matrix.cols() == 3 && matrix.size() == 6;
+ check(shape_preserved, "self move preserves shape and size");
+ if (!shape_preserved) return;
+
+ bool values_preserved = true;
+ for (size_t row = 0; row < 2; ++row) {
+  for (size_t col = 0; col < 3; ++col) {
+   values_preserved &= matrix[row][col] == T(golden[row][col]);
+  }
+ }
+ check(values_preserved, "self move preserves golden values");
+
+ const bool storage_preserved =
+     reinterpret_cast<std::uintptr_t>(&matrix[0]) == row_address &&
+     reinterpret_cast<std::uintptr_t>(&matrix[0][0]) == cell_address;
+ check(storage_preserved, "self move preserves row and element storage addresses");
+ if (!storage_preserved) return;
+
+ auto row = row_begin;
+ auto cell = cell_begin;
+ check(row == matrix.begin() && row_end == matrix.end(), "self move preserves row iterators and endpoint");
+ check(cell == matrix[0].begin() && cell_end == matrix[0].end(), "self move preserves element iterators and endpoint");
+ auto last_row = row_end;
+ auto last_cell = cell_end;
+ --last_row;
+ --last_cell;
+ check(&*last_row == &matrix[1] && &*last_cell == &matrix[0][2],
+       "saved self move endpoints decrement to valid storage");
+ *cell = T(71);
+ (*last_row)[2] = T(73);
+ check(matrix[0][0] == T(71) && matrix[1][2] == T(73) && matrix[0][2] == T(7),
+       "saved self move iterators mutate original storage");
+}
+int main(){self_move_aliases<int>();self_move_aliases<float>();self_move_aliases<double>();self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}

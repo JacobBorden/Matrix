@@ -4,7 +4,7 @@ Separate executables use the seven hash-verified inputs in ../multiplication-v1/
 
 Acceptance: asymmetric 2x3 row-major golden traversal for int/float/double; row and element prefix/postfix increment/decrement, prefix return identity, storage aliases and default empty range equality, with checks active under NDEBUG. Neuro lacks const Matrix begin/end; Bitmap exposes mutable rows through const Matrix iterators. Both expose mutable elements through const row iterators. This records legacy behavior, not an approved const contract.
 
-Run `python3 characterization/iterator-v1/run.py --output /absolute/fresh/output` from this worktree. Neuro uses C++17; Bitmap C++20. The runner verifies pins and runs Debug, Release and ASan+UBSan separately. It saves exact commands, logs and counts. Expected counts: Neuro 279, Bitmap 246 per execution.
+Run `python3 characterization/iterator-v1/run.py --output /absolute/fresh/output` from this worktree. Neuro uses C++17; Bitmap C++20. The runner verifies pins and runs Debug, Release and ASan+UBSan separately. It saves exact commands, logs and counts. Expected counts: Neuro 303, Bitmap 270 per execution.
 
 No column iterator traversal is attempted: independently allocated rows do not establish contiguous scalar storage. Full standard iterator conformance, invalidation, degenerate shapes beyond default empty, Pixel, Windows/MSVC, extraction and package/consumer acceptance remain open. No legacy input, kernel, package header or consumer is modified.
 
@@ -22,4 +22,6 @@ November 13 increment: saved row/element iterators and endpoints follow matrix s
 
 November 14 increment: copy construction and assignment into a nonempty destination preserve saved source row/element iterators and endpoints, with independent copied storage, golden values, assignment return identity and mutation isolation for int/float/double. No replaced-destination iterator is used.
 
-November 17 increment: self-copy assignment through a const alias preserves return identity, source row/element iterators and endpoints, storage aliases, shape and golden values for int/float/double. Saved iterators remain usable for mutation and valid endpoint decrement. Self-move assignment and resize invalidation remain unqualified.
+November 17 increment: self-copy assignment through a const alias preserves return identity, source row/element iterators and endpoints, storage aliases, shape and golden values for int/float/double. Saved iterators remain usable for mutation and valid endpoint decrement.
+
+Self-move increment: assigning a nonempty matrix from an rvalue alias preserves return identity, shape, values, storage addresses and saved row and element iterators for int, float and double. The fixture checks endpoint decrement and mutation through the saved iterators. Resize invalidation remains open.
