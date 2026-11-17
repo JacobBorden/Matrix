@@ -191,4 +191,22 @@ template<class T> void copy_aliases(){
  *assigned[0].begin()=T(71);(*assigned.begin())[2]=T(73);
  check(*cell==T(-17) && (*row)[2]==T(23) && copied[0][0]==T(0) && copied[0][2]==T(4),"assigned iterator mutations preserve source and earlier copy");
 }
-int main(){copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void self_copy_aliases(){
+ using M=Matrix::Matrix<T>;
+ M m(2,3);const int golden[]={-3,2,7,11,-9,4};
+ for(size_t r=0;r<2;++r)for(size_t c=0;c<3;++c)m[r][c]=T(golden[r*3+c]);
+ auto row=m.begin(),row_end=m.end();
+ auto cell=m[0].begin(),cell_end=m[0].end();
+ const M& alias=m;
+ check(&(m=alias)==&m,"self copy assignment return identity");
+ check(row==m.begin() && row_end==m.end(),"self copy preserves row iterators and endpoint");
+ check(cell==m[0].begin() && cell_end==m[0].end(),"self copy preserves element iterators and endpoint");
+ check(&*row==&m[0] && &*cell==&m[0][0],"self copy preserves storage aliases");
+ bool ok=true;for(size_t r=0;r<2;++r)for(size_t c=0;c<3;++c)ok=ok && m[r][c]==T(golden[r*3+c]);
+ check(ok && m.rows()==2 && m.cols()==3,"self copy preserves shape and golden values");
+ *cell=T(71);(*row)[2]=T(73);
+ check(m[0][0]==T(71) && m[0][2]==T(73) && m[1][2]==T(4),"saved self copy iterators mutate original storage");
+ auto last_row=row_end;--last_row;auto last_cell=cell_end;--last_cell;
+ check(&*last_row==&m[1] && &*last_cell==&m[0][2],"saved self copy endpoints decrement to valid storage");
+}
+int main(){self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}

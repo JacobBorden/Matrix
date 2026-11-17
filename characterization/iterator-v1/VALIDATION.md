@@ -97,3 +97,23 @@ Full iterator conformance/resize invalidation, actual Pixel, serialization, Wind
 Tested SHA256 inputs:
 - iterator.cpp: `530155123f199ffb74ae6045b9f0f3ad3c82612e618082ee8d61ac153417b7a4`
 - run.py: `cbd9823e4a9fe8b74ead7cf0375c2ee87981a52a34ab67d781d7f3b681d9a9ee`
+
+# November 17, 2026 self-copy iterator lifetime increment
+
+Canonical fetched origin/master: `1500576c382036085bcd5b267c815e9b9117d1ba` (already ancestor). Persistent branch `codex/matrix-legacy-characterization`; parent `8098c5feb0c52b8ee4d83a561d7863f723f83101`. Candidate is the commit containing this note.
+
+Acceptance: self-copy assignment through a const alias preserves return identity, shape, golden values, row/element storage aliases and saved iterators/endpoints for int/float/double. Saved iterators support mutation and valid decrement from nonempty endpoints. Both pinned implementations explicitly guard self-copy. No self-move or invalidated iterator is used.
+
+Explicit working directory: `/mnt/c/Users/jacob/Documents/Codex/2026-10-31/task/four-publication-repair/publication/worktrees/matrix`.
+Initial command: `python3 characterization/iterator-v1/run.py --output "$PWD/work/20261117-self-copy-iterators"`. Neuro Debug and Release each failed three new shape assertions because the fixture mistook total-element size() for row count. Stopped owned runner/compiler descendants (exit143); logs and STOP.txt retained. Corrected assertion to rows()==2 && cols()==3.
+Corrected command: `python3 -u characterization/iterator-v1/run.py --output "$PWD/work/20261117-self-copy-final"`. Results recorded below.
+
+GCC (SUSE Linux)15.2.1 20251006, Linux/libstdc++; Neuro C++17, Bitmap C++20; Debug, Release/NDEBUG, ASan+UBSan. Runner verifies seven pinned legacy hashes. Raw commands/logs and results remain in work/20261117-self-copy-final.
+
+Full iterator conformance, resize invalidation, actual Pixel, serialization, Windows/MSVC, extraction and package/consumer acceptance remain open. Primary unrelated edits and work preserved. Existing draft PR1 reused; no merge/release. Prior head34 CI checks successful; candidate CI assessed separately. Repository lacks codex/codex-automation labels.
+
+Tested SHA256 inputs:
+- iterator.cpp: `8e1c3656834255e4755b141a6fc9d59cc723cb4f51a28c4502fbf7d8dc6fccdd`
+- run.py: `6d2d25b17e8642af844dd085708f98d843b3ab099d218f85e7f351056b554dcf`
+
+Corrected full runner exit0: six executions, Neuro279/Bitmap246 each, 1575 passes, zero failures or sanitizer diagnostics. Scoped diff whitespace check passed.
