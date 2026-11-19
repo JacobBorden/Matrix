@@ -262,4 +262,65 @@ template<class T> void self_move_aliases() {
  check(matrix[0][0] == T(71) && matrix[1][2] == T(73) && matrix[0][2] == T(7),
        "saved self move iterators mutate original storage");
 }
-int main(){self_move_aliases<int>();self_move_aliases<float>();self_move_aliases<double>();self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void fixed_width_growth() {
+ using M = Matrix::Matrix<T>;
+ M matrix(2, 3);
+ const int golden[3][3] = {{-3, 2, 7}, {11, -9, 4}, {0, 0, 0}};
+ for (size_t row = 0; row < 2; ++row) {
+  for (size_t col = 0; col < 3; ++col) {
+   matrix[row][col] = T(golden[row][col]);
+  }
+ }
+
+ // Capture address values while the allocations are live. Use only fresh iterators after resize.
+ const auto old_row = reinterpret_cast<std::uintptr_t>(&matrix[0]);
+ const auto old_first = reinterpret_cast<std::uintptr_t>(&matrix[0][0]);
+ const auto old_second = reinterpret_cast<std::uintptr_t>(&matrix[1][0]);
+
+ matrix.resize(3, 3);
+ const bool shape_ok = matrix.rows() == 3 && matrix.cols() == 3 && matrix.size() == 9;
+ check(shape_ok, "fixed-width growth updates shape and size");
+ if (!shape_ok) return;
+
+ check(reinterpret_cast<std::uintptr_t>(&matrix[0]) != old_row,
+       "fixed-width growth replaces the row array");
+ const auto first_address = reinterpret_cast<std::uintptr_t>(&matrix[0][0]);
+ const auto second_address = reinterpret_cast<std::uintptr_t>(&matrix[1][0]);
+#ifdef NEURO
+ check(first_address == old_first && second_address == old_second,
+       "Neuro fixed-width growth retains both scalar allocations");
+#else
+ // The second replacement may reuse the freed first allocation.
+ check(first_address != old_first && second_address != old_second,
+       "Bitmap fixed-width growth replaces each row's scalar allocation");
+#endif
+
+ auto row = matrix.begin();
+ const auto row_end = matrix.end();
+ bool traversal_ok = true;
+ size_t r = 0;
+ for (; r < 3 && row != row_end; ++r, ++row) {
+  traversal_ok &= &*row == &matrix[r];
+  auto cell = row->begin();
+  const auto cell_end = row->end();
+  size_t c = 0;
+  for (; c < 3 && cell != cell_end; ++c, ++cell) {
+   traversal_ok &= &*cell == &matrix[r][c] && *cell == T(golden[r][c]);
+  }
+  traversal_ok &= c == 3 && cell == cell_end;
+ }
+ traversal_ok &= r == 3 && row == row_end;
+ check(traversal_ok, "fresh iterators traverse retained values and zero-initialized new row");
+ if (!traversal_ok) return;
+
+ auto last_row = row_end;
+ --last_row;
+ auto last_cell = last_row->end();
+ --last_cell;
+ check(&*last_row == &matrix[2] && &*last_cell == &matrix[2][2],
+       "fresh endpoints decrement to the new row and its final cell");
+ *last_cell = T(71);
+ check(matrix[2][2] == T(71) && matrix[2][1] == T(0) && matrix[1][2] == T(4),
+       "fresh iterator mutation reaches only the selected new cell");
+}
+int main(){fixed_width_growth<int>();fixed_width_growth<float>();fixed_width_growth<double>();self_move_aliases<int>();self_move_aliases<float>();self_move_aliases<double>();self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}

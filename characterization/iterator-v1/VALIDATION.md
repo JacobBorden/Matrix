@@ -130,3 +130,16 @@ Tested SHA-256 hashes:
 
 - `iterator.cpp` `f57434b7a6e14d8279d54e8bd0e918ab63d9ed66a412874d3524d28a48564642`
 - `run.py` `b9b6452176d263311da89afffe65d768308ff326d7c29b21f4ef508bc6080662`
+
+## November 19, 2026 fixed-width matrix growth
+
+Canonical `origin/master` is `1500576c382036085bcd5b267c815e9b9117d1ba`, an ancestor of the persistent characterization branch. The parent for this increment is `882dfde6d165f98e49781311d7af748620460c0b`. The candidate is the commit containing this note.
+
+Growing a 2x3 matrix to 3x3 replaces the row array in both pinned implementations. Neuro transfers the two original scalar allocations, while Bitmap replaces them. For int, float and double, the fixture verifies both storage outcomes, exact traversal of the retained values and zero-initialized new row, decrement from the fresh endpoints and mutation of the new row. Old addresses are captured as integers while their allocations are live. All traversal uses fresh iterators. The result covers this one growth shape.
+
+From the persistent worktree, `python3 -u characterization/iterator-v1/run.py --output "$PWD/work/20261119-fixed-width-growth"` exited 0. All seven pinned hashes matched. Six isolated Debug, Release with NDEBUG and ASan+UBSan runs passed 1,827 checks, including 108 new checks, with zero test failures or sanitizer diagnostics. Neuro C++17 passed 321 checks per run and Bitmap C++20 passed 288. Toolchain was GCC (SUSE Linux) 15.2.1 20251006 with libstdc++. Exact commands and logs are in `work/20261119-fixed-width-growth/results.json` and adjacent files.
+
+Tested SHA-256 hashes:
+
+- `iterator.cpp` `6b048b2413ea8cc999b1c9b3be5097a2931c9bcc5bc74ed14f3ba115dae775d2`
+- `run.py` `6bce521922090b7a458c3abd2b277371158f828ab367a67b1f25ba2e6bd5986f`
