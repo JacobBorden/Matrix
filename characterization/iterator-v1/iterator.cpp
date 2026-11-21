@@ -323,4 +323,55 @@ template<class T> void fixed_width_growth() {
  check(matrix[2][2] == T(71) && matrix[2][1] == T(0) && matrix[1][2] == T(4),
        "fresh iterator mutation reaches only the selected new cell");
 }
-int main(){fixed_width_growth<int>();fixed_width_growth<float>();fixed_width_growth<double>();self_move_aliases<int>();self_move_aliases<float>();self_move_aliases<double>();self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}
+template<class T> void column_growth() {
+ Matrix::Matrix<T> matrix(2, 3);
+ const int golden[2][4] = {{-3, 2, 7, 0}, {11, -9, 4, 0}};
+ for (size_t r = 0; r < 2; ++r) {
+  std::copy_n(golden[r], 3, matrix[r].begin());
+ }
+
+ // Only compare integer snapshots after resize. Use fresh iterators for all access.
+ const auto old_rows = reinterpret_cast<std::uintptr_t>(&matrix[0]);
+ const auto old_first = reinterpret_cast<std::uintptr_t>(&matrix[0][0]);
+ const auto old_second = reinterpret_cast<std::uintptr_t>(&matrix[1][0]);
+ matrix.resize(2, 4);
+
+ const bool shape_ok = matrix.rows() == 2 && matrix.cols() == 4 && matrix.size() == 8;
+ check(shape_ok, "column growth updates shape and size");
+ if (!shape_ok) return;
+
+ check(reinterpret_cast<std::uintptr_t>(&matrix[0]) != old_rows,
+       "column growth replaces the row array");
+ check(reinterpret_cast<std::uintptr_t>(&matrix[0][0]) != old_first &&
+       reinterpret_cast<std::uintptr_t>(&matrix[1][0]) != old_second,
+       "column growth replaces each row's scalar allocation");
+
+ auto row = matrix.begin();
+ const auto row_end = matrix.end();
+ bool traversal_ok = true;
+ size_t r = 0;
+ for (; r < 2 && row != row_end; ++r, ++row) {
+  traversal_ok &= &*row == &matrix[r];
+  auto cell = row->begin();
+  const auto cell_end = row->end();
+  size_t c = 0;
+  for (; c < 4 && cell != cell_end; ++c, ++cell) {
+   traversal_ok &= &*cell == &matrix[r][c] && *cell == T(golden[r][c]);
+  }
+  traversal_ok &= c == 4 && cell == cell_end;
+ }
+ traversal_ok &= r == 2 && row == row_end;
+ check(traversal_ok, "fresh iterators traverse retained values and a zero in each new column position");
+ if (!traversal_ok) return;
+
+ auto last_row = row_end;
+ --last_row;
+ auto last_cell = last_row->end();
+ --last_cell;
+ check(&*last_row == &matrix[1] && &*last_cell == &matrix[1][3],
+       "fresh endpoints decrement to the final row and its new cell");
+ *last_cell = T(71);
+ check(matrix[1][3] == T(71) && matrix[1][2] == T(4) && matrix[0][3] == T(0),
+       "fresh iterator mutation preserves the neighboring and other row's new cell");
+}
+int main(){column_growth<int>();column_growth<float>();column_growth<double>();fixed_width_growth<int>();fixed_width_growth<float>();fixed_width_growth<double>();self_move_aliases<int>();self_move_aliases<float>();self_move_aliases<double>();self_copy_aliases<int>();self_copy_aliases<float>();self_copy_aliases<double>();copy_aliases<int>();copy_aliases<float>();copy_aliases<double>();move_aliases<int>();move_aliases<float>();move_aliases<double>();row_sort<int>();row_sort<float>();row_sort<double>();row_algorithms<int>();row_algorithms<float>();row_algorithms<double>();cases<int>();cases<float>();cases<double>();narrow_shapes<int>();narrow_shapes<float>();narrow_shapes<double>();std::cout<<"RESULT passed="<<passed<<" failed="<<failed<<'\n';return failed?1:0;}

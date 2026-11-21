@@ -143,3 +143,16 @@ Tested SHA-256 hashes:
 
 - `iterator.cpp` `6b048b2413ea8cc999b1c9b3be5097a2931c9bcc5bc74ed14f3ba115dae775d2`
 - `run.py` `6bce521922090b7a458c3abd2b277371158f828ab367a67b1f25ba2e6bd5986f`
+
+## November 21, 2026 column growth
+
+Canonical Matrix master is `1500576c382036085bcd5b267c815e9b9117d1ba`, already an ancestor of task parent `45048bdafa10ed53765825619547beb3d964f534`. Growing a 2x3 matrix to 2x4 replaces the row array and each row's scalar allocation in both pinned implementations. For int, float and double, fresh iterators traverse both preserved asymmetric prefixes and the zero-initialized fourth column. Endpoint decrement and mutation verify aliases and isolation between rows.
+
+The local `python3 -u characterization/iterator-v1/run.py --output "$PWD/work/20261121-column-growth.Rrf2pt"` invocation exited 1 when the Neuro ASan+UBSan compile reached the 90-second subprocess deadline. Neuro Debug and Release each passed 339 checks before the timeout. A local retry invoked the same runner with Python's `runpy.run_path`, setting only compiler subprocess deadlines to 240 seconds. It exited 0. Six isolated Debug, Release with NDEBUG, and ASan+UBSan executions passed 1,935 checks, including 108 new checks. Neuro C++17 passed 339 per execution and Bitmap C++20 passed 306. All seven pins matched, with zero test failures or sanitizer diagnostics on retry. Toolchain was GCC (SUSE Linux) 15.2.1 20251006 and libstdc++. Exact compiler and test commands are in `work/20261121-column-growth-retry.u0iei5c5/results.json`; the initial timeout and logs are in the first output directory. The checked-in CI deadline still applies.
+
+Tested SHA-256 digests:
+
+- `iterator.cpp` `ed27cc6b860c13f9818e840bce8ff0b63cb726b6cc9dd6bd6efcae5bc61cef34`
+- `run.py` `320d80566db121b38a2d877ed57e3487ea6d56eaa373257519953ffde2e2e77a`
+
+The fixture covers this growth shape on the pinned implementations. Independent review, exact-head CI, broader iterator compatibility, Pixel, serialization, Windows/MSVC, and package and consumer qualification remain open.
