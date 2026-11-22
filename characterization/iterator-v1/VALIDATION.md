@@ -156,3 +156,16 @@ Tested SHA-256 digests:
 - `run.py` `320d80566db121b38a2d877ed57e3487ea6d56eaa373257519953ffde2e2e77a`
 
 The fixture covers this growth shape on the pinned implementations. Independent review, exact-head CI, broader iterator compatibility, Pixel, serialization, Windows/MSVC, and package and consumer qualification remain open.
+
+## November 22, 2026 column shrink
+
+Canonical Matrix master is `1500576c382036085bcd5b267c815e9b9117d1ba`, an ancestor of task parent `9e36366c55a015363c4da58fe45f91541651a7b6`. Shrinking from 2x3 to 2x2 replaces the row array and both row scalar allocations in the pinned Neuro and Bitmap implementations. For int, float and double, fresh iterators traverse the retained prefixes {-3, 2} and {11, -9}, reach the expected endpoints, decrement to the last retained cell and mutate that cell without changing its neighbors. The fixture compares integer address snapshots taken while the original allocations are live. The existing 2x3 to 2x4 cases use the same fixture and still pass.
+
+Ran `characterization/iterator-v1/run.py --output "$PWD/work/20261122-column-shrink.mB7XDcc5"` from the persistent worktree through Python `runpy.run_path` with only the local g++ compilation timeout extended from 90 to 240 seconds, using the previous run's timeout evidence. The runner exited 0. Six isolated Debug, Release with NDEBUG, and ASan+UBSan executions passed 2,043 checks, including 108 new checks. Neuro C++17 passed 357 per execution and Bitmap C++20 passed 324. All seven pinned hashes matched, with zero test failures or sanitizer diagnostics. The toolchain was GCC (SUSE Linux) 15.2.1 20251006 with libstdc++. Exact compiler and test commands and logs are in `work/20261122-column-shrink.mB7XDcc5/results.json` and its adjacent logs. CI uses the checked-in deadline.
+
+Tested SHA-256 digests:
+
+- `iterator.cpp` `a4dd0dd1a65f757ebe924b8df2321c9a758ecd6507c0c76f000951877b18be0f`
+- `run.py` `e8c3dd43613704dcbe4e675550133d4030091c3bb517982a937360e3d2ff0887`
+
+This evidence covers the selected shrink shape on the pinned inputs. Independent review, exact-head CI, wider iterator compatibility, actual Pixel, serialization, Windows/MSVC, and package and consumer qualification remain open.
