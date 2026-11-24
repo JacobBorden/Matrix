@@ -19,6 +19,7 @@ jobs:
         slice:
           - multiplication
           - storage
+          - pixel
           - api
           - determinant
           - division

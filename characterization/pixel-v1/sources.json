@@ -1,0 +1,9 @@
+{
+  "repository": "JacobBorden/Bitmap",
+  "revision": "4df8a9cecdce77c9e0eb98b0b0897a0c473c0710",
+  "sha256": {
+    "src/bitmap/bitmap.h": "239d7399062a1f98a19df4429bf01976fc6447d2cf687d623c081384bcfbda6a",
+    "src/bitmapfile/bitmap_file.h": "4432d0eb80dd8d3359831d83ec98fa3760bf63f2d3b75e2b9665ff6477769d1e",
+    "src/matrix/matrix.h": "b48843eb204d2145117060165ea33fddb33d94dbd11c93744e577433e2eecd64"
+  }
+}
