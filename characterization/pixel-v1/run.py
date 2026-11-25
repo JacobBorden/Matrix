@@ -12,7 +12,7 @@ import subprocess
 SLICE = Path(__file__).resolve().parent
 ROOT = SLICE.parents[1]
 LEGACY = SLICE.parent / "multiplication-v1" / "legacy" / "bitmap"
-EXPECTED_CHECKS = 21
+EXPECTED_CHECKS = 28
 
 
 def run(output, results, label, command):
@@ -61,7 +61,9 @@ def main():
     for mode, flags in modes.items():
         executable = output / f"bitmap-{mode}"
         command = ["g++", "-std=c++20", "-Wall", "-Wextra", *flags,
-                   "-I", str(LEGACY / "src"), str(SLICE / "pixel.cpp"), "-o", str(executable)]
+                   "-I", str(LEGACY / "src"), str(SLICE / "pixel.cpp"),
+                   str(LEGACY / "src/bitmap/bitmap.cpp"),
+                   str(LEGACY / "src/bitmapfile/bitmap_file.cpp"), "-o", str(executable)]
         if run(output, results, f"bitmap-{mode}-build", command) == 0:
             run(output, results, f"bitmap-{mode}-tests", [str(executable)])
 

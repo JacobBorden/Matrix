@@ -6,6 +6,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace {
 using Image = Matrix::Matrix<Pixel>;
@@ -66,6 +67,57 @@ bool is_empty(const Image& image)
 auto row_storage(Image& image)
 {
     return std::array{&image.at(0, 0), &image.at(1, 0)};
+}
+
+void check_bitmap_conversion()
+{
+    constexpr Pixel e{13, 29, 53, 255};
+    constexpr Pixel f{71, 97, 113, 255};
+    const Pixel first_row[][3]{{{1, 23, 45, 255}, {89, 101, 123, 255}, e},
+                               {{167, 189, 201, 255}, {245, 254, 0, 255}, f}};
+    const Pixel last_row[][3]{{{167, 189, 201, 255}, {245, 254, 0, 255}, f},
+                              {{1, 23, 45, 255}, {89, 101, 123, 255}, e}};
+
+    Bitmap::File input;
+    input.bitmapInfoHeader.biWidth = 3;
+    input.bitmapInfoHeader.biHeight = -2;
+    input.bitmapInfoHeader.biBitCount = 24;
+    input.bitmapData = {1, 23, 45, 89, 101, 123, 13, 29, 53, 240, 241, 242,
+                        167, 189, 201, 245, 254, 0, 71, 97, 113, 243, 244, 245};
+    check(matches(CreateMatrixFromBitmap(input), first_row),
+          "24-bit top-down input retains stored rows and skips padding");
+
+    input.bitmapInfoHeader.biHeight = 2;
+    input.bitmapData = {167, 189, 201, 245, 254, 0, 71, 97, 113, 243, 244, 245,
+                        1, 23, 45, 89, 101, 123, 13, 29, 53, 240, 241, 242};
+    check(matches(CreateMatrixFromBitmap(input), last_row),
+          "24-bit bottom-up input retains stored rows and skips padding");
+    input.bitmapData.pop_back();
+    check(is_empty(CreateMatrixFromBitmap(input)),
+          "24-bit input missing a byte of final row padding yields an empty matrix");
+
+    Image image(2, 3);
+    const Pixel expected[][3]{{a, b, e}, {c, d, f}};
+    for (std::size_t row = 0; row < 2; ++row) {
+        for (std::size_t col = 0; col < 3; ++col) {
+            image.at(row, col) = expected[row][col];
+        }
+    }
+    Bitmap::File output = CreateBitmapFromMatrix(image);
+    const auto& info = output.bitmapInfoHeader;
+    check(output.IsValid() && info.biSize == 40 && info.biWidth == 3 && info.biHeight == 2
+              && info.biPlanes == 1 && info.biBitCount == 32 && info.biCompression == 0
+              && info.biSizeImage == 24,
+          "output has a positive-height uncompressed 32-bit info header");
+    const auto& file = output.bitmapFileHeader;
+    check(file.bfType == 0x4D42 && file.bfOffBits == 54 && file.bfSize == 78
+              && file.bfReserved1 == 0 && file.bfReserved2 == 0,
+          "output file header has the expected signature, size and pixel offset");
+    const std::vector<std::uint8_t> bytes{1, 23, 45, 67, 89, 101, 123, 145, 13, 29, 53, 255,
+                                          167, 189, 201, 223, 245, 254, 0, 255, 71, 97, 113, 255};
+    check(output.bitmapData == bytes, "output stores exact BGRA bytes in matrix row order");
+    check(matches(CreateMatrixFromBitmap(output), expected) && matches(image, expected),
+          "32-bit round trip preserves every channel and leaves source pixels intact");
 }
 
 void check_copy(Image& copy, Image& source)
@@ -142,6 +194,8 @@ int main()
     destination.resize(3, 2, fill);
     const Pixel regrown[][2]{{a, fill}, {c, fill}, {fill, fill}};
     check(matches(destination, regrown), "fill resize initializes only newly exposed pixels");
+
+    check_bitmap_conversion();
 
     std::cout << "RESULT passed=" << passed << " failed=" << failed << '\n';
     return failed != 0;

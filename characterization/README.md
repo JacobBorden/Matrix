@@ -2,7 +2,7 @@
 
 These eighteen slices record the behavior of two separately compiled legacy implementations before a shared package is extracted. They do not change the Matrix package header, either consumer repository, numerical kernels, or storage layout.
 
-The immutable inputs and their SHA-256 hashes are listed in [multiplication-v1/sources.json](multiplication-v1/sources.json): Neuro-Net-DLL at `87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c` and Bitmap at `4df8a9cecdce77c9e0eb98b0b0897a0c473c0710`. The seven source/test support files are preserved byte-for-byte. The numeric and generic-value runners verify those hashes before compiling, and each implementation has its own executable. The [Pixel slice](pixel-v1/README.md) verifies its three Bitmap headers against a dedicated manifest and builds only the Bitmap implementation.
+The immutable inputs and their SHA-256 hashes are listed in [multiplication-v1/sources.json](multiplication-v1/sources.json): Neuro-Net-DLL at `87ee5b2e65fe0a7bb4d1cab1de8feda64b07832c` and Bitmap at `4df8a9cecdce77c9e0eb98b0b0897a0c473c0710`. The seven source/test support files are preserved byte-for-byte. The numeric and generic-value runners verify those hashes before compiling, and each implementation has its own executable. The [Pixel slice](pixel-v1/README.md) verifies its seven Bitmap inputs against a dedicated manifest and builds only the Bitmap implementation.
 
 Run a slice from this repository with a fresh absolute output directory:
 
