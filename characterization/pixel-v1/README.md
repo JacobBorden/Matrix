@@ -11,7 +11,7 @@ zero initialization, mutable aliases, independent const reads, checked bounds,
 independent row storage on copy, and row storage transfer on move. It also
 checks that a moved-from matrix can be reused, that growing or shrinking
 preserves the overlapping pixels, and that the fill overload initializes newly
-exposed pixels. The storage checks account for 21 of the 28 checks in each
+exposed pixels. The storage checks account for 21 of the 33 checks in each
 build, including in Release with NDEBUG.
 
 The conversion fixture uses asymmetric 2×3 images and three sentinel padding
@@ -23,9 +23,16 @@ is missing. Export writes a positive-height, uncompressed 32-bit header and
 exact row-ordered BGRA bytes. Reading those bytes back preserves all four
 channels, including non-opaque alpha values.
 
-These are observations of the pinned in-memory conversion routines. On-disk
-BMP I/O, tensor export orientation, SIMD paths, Windows/MSVC, and an extracted
-Matrix package require separate validation.
+The disk fixture saves a top-down 2×3, 24-bit BMP from tightly packed pixels.
+It checks the complete little-endian file against golden bytes, including the
+negative height and three zero padding bytes per row. Reopening retains the
+signed height and padded image size in the header, but strips padding from the
+pixel buffer. Passing that buffer to the pinned matrix converter yields an
+empty matrix because the converter expects the padded stride. This mismatch
+needs review when defining the file-to-matrix compatibility contract.
+
+Other on-disk layouts, tensor export orientation, SIMD paths, Windows/MSVC,
+and an extracted Matrix package require separate validation.
 
 ```sh
 python3 characterization/pixel-v1/run.py --output /tmp/matrix-pixel

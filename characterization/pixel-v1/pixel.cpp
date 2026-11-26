@@ -1,7 +1,9 @@
 #include "bitmap/bitmap.h"
 
 #include <array>
+#include <fstream>
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
 #include <string_view>
 #include <type_traits>
@@ -120,6 +122,51 @@ void check_bitmap_conversion()
           "32-bit round trip preserves every channel and leaves source pixels intact");
 }
 
+void check_bitmap_file(const char* path)
+{
+    // File::SaveAs consumes tightly packed pixels, even for 24-bit rows.
+    const std::vector<std::uint8_t> packed{1, 23, 45, 89, 101, 123, 13, 29, 53,
+                                          167, 189, 201, 245, 254, 0, 71, 97, 113};
+    Bitmap::File source;
+    source.bitmapInfoHeader.biSize = 40;
+    source.bitmapInfoHeader.biWidth = 3;
+    source.bitmapInfoHeader.biHeight = -2;
+    source.bitmapInfoHeader.biPlanes = 1;
+    source.bitmapInfoHeader.biBitCount = 24;
+    source.bitmapData = packed;
+    source.SetValid();
+    check(source.SaveAs(path), "save top-down 24-bit file from packed rows");
+
+    const std::vector<std::uint8_t> expected{
+        // File header: 78 bytes in total, pixel data at offset 54.
+        0x42, 0x4D, 78, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0,
+        // Info header: width 3, height -2, 24 bpp, 24 stored image bytes.
+        40, 0, 0, 0, 3, 0, 0, 0, 254, 255, 255, 255, 1, 0, 24, 0,
+        0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        // Two physical rows, each followed by three zero padding bytes.
+        1, 23, 45, 89, 101, 123, 13, 29, 53, 0, 0, 0,
+        167, 189, 201, 245, 254, 0, 71, 97, 113, 0, 0, 0,
+    };
+    std::ifstream file(path, std::ios::binary);
+    const std::vector<std::uint8_t> actual(std::istreambuf_iterator<char>{file},
+                                           std::istreambuf_iterator<char>{});
+    check(file.is_open() && actual == expected, "disk header and padded payload match golden bytes");
+    file.close();
+
+    Bitmap::File reopened;
+    const bool opened = reopened.Open(path);
+    check(opened && reopened.IsValid() && reopened.bitmapInfoHeader.biWidth == 3
+              && reopened.bitmapInfoHeader.biHeight == -2
+              && reopened.bitmapInfoHeader.biBitCount == 24
+              && reopened.bitmapInfoHeader.biSizeImage == 24,
+          "open retains signed height, depth and padded header size");
+    check(opened && reopened.bitmapData == packed,
+          "open removes row padding and retains the physical pixel order");
+    check(opened && reopened.bitmapData == packed && is_empty(CreateMatrixFromBitmap(reopened)),
+          "matrix conversion rejects the packed 24-bit buffer returned by open");
+}
+
 void check_copy(Image& copy, Image& source)
 {
     const Pixel original[][2]{{a, b}, {c, d}};
@@ -134,8 +181,13 @@ void check_copy(Image& copy, Image& source)
 }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    if (argc != 2) {
+        std::cerr << "Expected a path for the BMP fixture\n";
+        return 2;
+    }
+
     Image source(2, 2);
     const Pixel blank[][2]{{clear, clear}, {clear, clear}};
     check(matches(source, blank), "default pixels have zeroed BGRA channels");
@@ -196,6 +248,7 @@ int main()
     check(matches(destination, regrown), "fill resize initializes only newly exposed pixels");
 
     check_bitmap_conversion();
+    check_bitmap_file(argv[1]);
 
     std::cout << "RESULT passed=" << passed << " failed=" << failed << '\n';
     return failed != 0;
