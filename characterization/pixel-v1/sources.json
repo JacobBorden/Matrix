@@ -1,0 +1,13 @@
+{
+  "repository": "JacobBorden/Bitmap",
+  "revision": "4df8a9cecdce77c9e0eb98b0b0897a0c473c0710",
+  "sha256": {
+    "src/bitmap/bitmap.h": "239d7399062a1f98a19df4429bf01976fc6447d2cf687d623c081384bcfbda6a",
+    "src/bitmapfile/bitmap_file.h": "4432d0eb80dd8d3359831d83ec98fa3760bf63f2d3b75e2b9665ff6477769d1e",
+    "src/matrix/matrix.h": "b48843eb204d2145117060165ea33fddb33d94dbd11c93744e577433e2eecd64",
+    "src/bitmap/bitmap.cpp": "bb0684ef50ad58f77aae8c54fb3eb598f7a33d92d2995337bb366af97f72e0f3",
+    "src/bitmapfile/bitmap_file.cpp": "339237640ec602bf1f3a567c4bf853a67a30d699a5e49c8a47c52da94585c27f",
+    "src/safe_math.hpp": "1790a6758c293dc56fbfc4863bf7a1f8a74ea3997991e750a7db0b1355e94728",
+    "src/simd_utils.hpp": "839bbacef0abeb5e2d279528b8702ff8714f0254c2530ede994c25f5bb90f25f"
+  }
+}
