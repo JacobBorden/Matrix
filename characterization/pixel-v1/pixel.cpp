@@ -122,7 +122,7 @@ void check_bitmap_conversion()
           "32-bit round trip preserves every channel and leaves source pixels intact");
 }
 
-void check_bitmap_file(const char* path)
+void check_bitmap_24bit_file(const char* path)
 {
     // File::SaveAs consumes tightly packed pixels, even for 24-bit rows.
     const std::vector<std::uint8_t> packed{1, 23, 45, 89, 101, 123, 13, 29, 53,
@@ -167,6 +167,53 @@ void check_bitmap_file(const char* path)
           "matrix conversion rejects the packed 24-bit buffer returned by open");
 }
 
+void check_bitmap_32bit_file(const char* path)
+{
+    constexpr Pixel e{13, 29, 53, 0};
+    constexpr Pixel f{71, 97, 113, 192};
+    const Pixel expected[][3]{{a, b, e}, {c, d, f}};
+    Image source(2, 3);
+    for (std::size_t row = 0; row < 2; ++row) {
+        for (std::size_t col = 0; col < 3; ++col) {
+            source.at(row, col) = expected[row][col];
+        }
+    }
+
+    Bitmap::File output = CreateBitmapFromMatrix(source);
+    check(output.IsValid() && output.SaveAs(path), "save 32-bit file from a Pixel matrix");
+
+    const std::vector<std::uint8_t> payload{
+        1, 23, 45, 67, 89, 101, 123, 145, 13, 29, 53, 0,
+        167, 189, 201, 223, 245, 254, 0, 255, 71, 97, 113, 192,
+    };
+    std::vector<std::uint8_t> golden{
+        // File header: 78 bytes in total, pixel data at offset 54.
+        0x42, 0x4D, 78, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0,
+        // Info header: width 3, height 2, 32 bpp, 24 stored image bytes.
+        40, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 1, 0, 32, 0,
+        0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+    };
+    golden.insert(golden.end(), payload.begin(), payload.end());
+    {
+        std::ifstream file(path, std::ios::binary);
+        const std::vector<std::uint8_t> actual(std::istreambuf_iterator<char>{file},
+                                               std::istreambuf_iterator<char>{});
+        check(file.is_open() && actual == golden,
+              "32-bit disk header and unpadded BGRA payload match golden bytes");
+    }
+
+    Bitmap::File reopened;
+    const bool opened = reopened.Open(path);
+    const auto& info = reopened.bitmapInfoHeader;
+    check(opened && reopened.IsValid() && info.biWidth == 3 && info.biHeight == 2
+              && info.biBitCount == 32 && info.biCompression == 0 && info.biSizeImage == 24,
+          "open retains the 32-bit file's shape, positive height and image size");
+    check(opened && reopened.bitmapData == payload, "open preserves exact 32-bit BGRA payload");
+    check(opened && matches(CreateMatrixFromBitmap(reopened), expected),
+          "32-bit disk round trip preserves matrix row order and every BGRA channel");
+}
+
 void check_copy(Image& copy, Image& source)
 {
     const Pixel original[][2]{{a, b}, {c, d}};
@@ -183,8 +230,8 @@ void check_copy(Image& copy, Image& source)
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2) {
-        std::cerr << "Expected a path for the BMP fixture\n";
+    if (argc != 3) {
+        std::cerr << "Expected paths for the 24-bit and 32-bit BMP fixtures\n";
         return 2;
     }
 
@@ -248,7 +295,8 @@ int main(int argc, char* argv[])
     check(matches(destination, regrown), "fill resize initializes only newly exposed pixels");
 
     check_bitmap_conversion();
-    check_bitmap_file(argv[1]);
+    check_bitmap_24bit_file(argv[1]);
+    check_bitmap_32bit_file(argv[2]);
 
     std::cout << "RESULT passed=" << passed << " failed=" << failed << '\n';
     return failed != 0;

@@ -11,7 +11,7 @@ zero initialization, mutable aliases, independent const reads, checked bounds,
 independent row storage on copy, and row storage transfer on move. It also
 checks that a moved-from matrix can be reused, that growing or shrinking
 preserves the overlapping pixels, and that the fill overload initializes newly
-exposed pixels. The storage checks account for 21 of the 33 checks in each
+exposed pixels. The storage checks account for 21 of the 38 checks in each
 build, including in Release with NDEBUG.
 
 The conversion fixture uses asymmetric 2×3 images and three sentinel padding
@@ -30,6 +30,14 @@ signed height and padded image size in the header, but strips padding from the
 pixel buffer. Passing that buffer to the pinned matrix converter yields an
 empty matrix because the converter expects the padded stride. This mismatch
 needs review when defining the file-to-matrix compatibility contract.
+
+A second disk fixture exports an asymmetric 2-by-3 Pixel matrix to a 32-bit
+BMP. It checks all 78 on-disk bytes, including positive height and the exact
+BGRA payload. Opening that file returns the same payload, and matrix conversion
+recovers all six pixels in their original matrix rows, including zero,
+intermediate and full alpha. The packed and padded row strides coincide at
+32 bits per pixel, so this successful handoff provides a control for the
+24-bit result.
 
 Other on-disk layouts, tensor export orientation, SIMD paths, Windows/MSVC,
 and an extracted Matrix package require separate validation.
